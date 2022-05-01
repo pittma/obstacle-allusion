@@ -1,0 +1,20 @@
+name:                obstacle-allusion
+version:             0.1.0.0
+github:              "pittma/obstacle-allusion"
+author:              "dan pittman"
+maintainer:          "dan@dpitt.me"
+copyright:           "dan pittman"
+
+dependencies:
+- base >= 4.7 && < 5
+- hakyll
+- hakyll-hacks
+
+executables:
+  obstacle-allusion-exe:
+    main:                Site.hs
+    source-dirs:         .
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N

@@ -1,0 +1,31 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           obstacle-allusion
+version:        0.1.0.0
+homepage:       https://github.com/pittma/obstacle-allusion#readme
+bug-reports:    https://github.com/pittma/obstacle-allusion/issues
+author:         dan pittman
+maintainer:     dan@dpitt.me
+copyright:      dan pittman
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/pittma/obstacle-allusion
+
+executable obstacle-allusion-exe
+  main-is: Site.hs
+  other-modules:
+      Paths_obstacle_allusion
+  hs-source-dirs:
+      ./
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , hakyll
+    , hakyll-hacks
+  default-language: Haskell2010
