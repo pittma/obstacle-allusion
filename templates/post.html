@@ -2,17 +2,19 @@
 <html>
   <head>
     $partial("templates/header.html")$
+    $partial("templates/math.html")$
   </head>
   <body>
     <div id="content">
       $partial("templates/title.html")$
 
-      $for(items)$
-      <h1><a href="/$blog-route$">$title$</a></h1>
-      $teaser$
-      <p><a class="more" href="/$blog-route$">Keep reading…</a></p>
-      $endfor$
+       <h1>$title$</h1>
 
+       $if(subtitle)$
+       <h2>$subtitle$</h2>
+       $endif$
+
+       $body$
     </div>
   </body>
 </html>

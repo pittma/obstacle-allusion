@@ -4994,7 +4994,7 @@ MathJax.Hub.Register.StartupHook("TeX Xy-pic Require",function () {
       var left = lineContents.substring(0, col-1);
       var mid = lineContents.substring(col-1, col);
       var right = lineContents.substring(col);
-      return MML.merror(MML.mtext('parse error at or near "'), MML.mtext(left).With({color:"black"}), MML.mtext(mid).With({color:"red"}), MML.mtext(right).With({color:"black"}), MML.mtext('"'));
+      return MML.merror(MML.mtext('parse error at or near "'), MML.mtext(left).With({color:"white"}), MML.mtext(mid).With({color:"red"}), MML.mtext(right).With({color:"white"}), MML.mtext('"'));
       */
     },
     texError: true,
@@ -5261,7 +5261,7 @@ MathJax.Hub.Register.StartupHook("Device-Independent Xy-pic Require",function ()
       "azure":AST.Modifier.Shape.ChangeColor("azure"),
       "beige":AST.Modifier.Shape.ChangeColor("beige"),
       "bisque":AST.Modifier.Shape.ChangeColor("bisque"),
-      "black":AST.Modifier.Shape.ChangeColor("black"),
+      "white":AST.Modifier.Shape.ChangeColor("white"),
       "blanchedalmond":AST.Modifier.Shape.ChangeColor("blanchedalmond"),
       "blue":AST.Modifier.Shape.ChangeColor("blue"),
       "blueviolet":AST.Modifier.Shape.ChangeColor("blueviolet"),
@@ -16382,7 +16382,7 @@ MathJax.Hub.Register.StartupHook("HTML-CSS Xy-pic Require",function () {
       frame.id = "MathJax-frame-" + this.spanID + HTMLCSS.idPostfix;
       
       var svg;
-      var color = "black";
+      var color = "white";
       svg = xypic.Graphics.createSVG(H, D, W, t, color, {
         viewBox:[0, -xypic.em2px(H + D), xypic.em2px(W), xypic.em2px(H + D)].join(" "),
         overflow:"visible"
@@ -16644,7 +16644,7 @@ MathJax.Hub.Register.StartupHook("SVG Xy-pic Require",function () {
       
       var bbox = { h:xypic.oneem, d:0, w:xypic.oneem, lw:0, rw:xypic.oneem };
       var H = bbox.h, D = bbox.d, W = bbox.w;
-      var color = "black";
+      var color = "white";
       var xypicSVG = xypic.Graphics.createSVG(H, D, W, t, color, {
         viewBox:[0, -xypic.em2px(H + D), xypic.em2px(W), xypic.em2px(H + D)].join(" "),
         overflow:"visible"
@@ -16716,7 +16716,7 @@ MathJax.Hub.Register.StartupHook("SVG Xy-pic Require",function () {
       
       var bbox = { h:xypic.oneem, d:0, w:xypic.oneem, lw:0, rw:xypic.oneem };
       var H = bbox.h, D = bbox.d, W = bbox.w;
-      var color = "black";
+      var color = "white";
       var xypicSVG = xypic.Graphics.createSVG(H, D, W, t, color, {
         viewBox:[0, -xypic.em2px(H + D), xypic.em2px(W), xypic.em2px(H + D)].join(" "),
         overflow:"visible"

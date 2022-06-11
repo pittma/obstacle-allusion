@@ -1,3 +1,51 @@
+:root {
+    --bg: rgb(10, 24, 27);
+    --hr: rgb(151, 179, 154);
+}
+
+img { max-width: 100%; height: auto; } 
+
+hr {
+    border-color: var(--hr);
+}
+
 body {
-    background-color: #1c1c1c;
+    width: 95%;
+    background-color: var(--bg);
+    font-size: 20px;
+    font-family: Raleway, sans-serif;
+    color: #fff;
+    margin: auto;
+}
+
+h1, h2, h3, h4 {
+    font-family: Fondamento, cursive;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+}
+
+mjx-xypic-object, .MathJax, .math {
+    color: white !important;
+} g { stroke: white !important; }
+
+.more {
+    color: var(--hr);
+}
+
+#title {
+    font-size: 3em;
+}
+
+#nav a {
+    color: var(--hr);
+}
+
+
+@media screen and (min-width:910px){
+    body{
+        width: 80%;
+    }
 }

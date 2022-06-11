@@ -9,6 +9,7 @@ dependencies:
 - base >= 4.7 && < 5
 - hakyll
 - hakyll-hacks
+- filepath
 
 executables:
   obstacle-allusion-exe:
