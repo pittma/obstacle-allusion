@@ -110,7 +110,7 @@ mjx-xypic-object, .MathJax, .math {
     color: var(--hr);
 }
 
-@media screen and (max-width:910px){
+@media screen and (max-width:910px) {
     body {
 	width: 95%;
     }
@@ -129,5 +129,6 @@ mjx-xypic-object, .MathJax, .math {
 	display: inline;
 	border-left: var(--hr) dotted;
 	border-top: none;
+	padding: 0px 5px;
     }
 }

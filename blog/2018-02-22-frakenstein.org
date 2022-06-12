@@ -3,7 +3,7 @@ title: "I couldn't help myself, on “The Strange and Twisted Life of Frankenste
 publish: true
 ---
 
-Cf. [[https://www.newyorker.com/magazine/2018/02/12/the-strange-and-twisted-life-of-frankenstein][https://www.newyorker.com/magazine/2018/02/12/the-strange-and-twisted-life-of-frankenstein]]
+Cf. [[https://www.newyorker.com/magazine/2018/02/12/the-strange-and-twisted-life-of-frankenstein][The New Yorker: The Strange and Twisted Life of Frankenstein]]
 
 #+begin_quote
 Among the many moral and political ambiguities of Shelley’s novel is
@@ -37,8 +37,8 @@ Lepore also calls out The Monster’s ambivalence about his
 epistemological journey, wherein he considers it a curse to have
 learned to read, only to use that ability to read of his mistreatment
 in Frankenstein’s journals. Like Derrida’s spectre, neither he nor
-Shelley can return to an existence prior to the knowledge — and the
-pain that that knowledge causes — of catastrophic loss. This part of
+Shelley can return to an existence prior to the knowledge—and the
+pain that that knowledge causes—of catastrophic loss. This part of
 Russell’s analysis I do like, as he plucks out The Monster’s monologue
 as he stands over Frankenstein’s body:
 
