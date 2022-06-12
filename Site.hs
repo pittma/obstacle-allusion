@@ -14,6 +14,15 @@ main =
     match "index.html" $ do
       route idRoute
       compile $ do
+        posts <- take 5 <$> (recentFirst =<< loadAll "blog/*")
+        let context = listField
+              "items"
+              (defaultContext <> dateCtx <> blogRouteCtx <> teaser "posts") (return posts)
+        getResourceBody >>= applyAsTemplate context
+
+    match "archive.html" $ do
+      route toIdxPath
+      compile $ do
         posts <- recentFirst =<< loadAll "blog/*"
         let context = listField
               "items"
@@ -26,6 +35,13 @@ main =
         pandocCompiler >>=
         saveSnapshot "posts" >>=
         loadAndApplyTemplate "templates/post.html" (dateCtx <> defaultContext)
+  
+    match "*.html" $ do
+      route toIdxPath
+      compile $
+        getResourceBody >>=
+        loadAndApplyTemplate "templates/page.html" defaultContext
+  
 
 blogRouteCtx :: Context String
 blogRouteCtx =

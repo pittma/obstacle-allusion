@@ -1,6 +1,7 @@
 :root {
     --bg: rgb(10, 24, 27);
     --hr: rgb(151, 179, 154);
+    --highlight: #268bd2;
 }
 
 img { max-width: 100%; height: auto; } 
@@ -10,7 +11,7 @@ hr {
 }
 
 body {
-    width: 95%;
+    width: 80%;
     background-color: var(--bg);
     font-size: 20px;
     font-family: Raleway, sans-serif;
@@ -27,25 +28,106 @@ a {
     text-decoration: none;
 }
 
+article a {
+    color: var(--highlight);
+}
+
+article a:hover {
+    text-decoration: underline;
+}
+
+article a h1 {
+    color: #fff;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+blockquote {
+    margin: 0;
+    font-style: italic;
+    color: #f0f0f0;
+    padding: 1px 10px;
+    background: #444;
+}
+
 mjx-xypic-object, .MathJax, .math {
     color: white !important;
 } g { stroke: white !important; }
 
-.more {
-    color: var(--hr);
+.post-title {
+    font-size: 2.5em;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.index-title {
+    margin: 0;
+}
+
+.post-date {
+    margin: 0;
+}
+
+#sidebar {
+    width: 150px;
+    font-variant: small-caps;
+    position: absolute;
+}
+
+#content {
+    margin-left: 180px;
 }
 
 #title {
     font-size: 3em;
+    font-family: Raleway, sans-serif;
+    margin-bottom: 0;
+    margin-top: 0;
+    background-color: var(--highlight);
+    text-align: center;
+}
+
+#subtitle {
+   margin-top: 0;
+}
+
+#nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#nav li {
+    border-top: var(--hr) dotted;
+    padding: 5px 0;
 }
 
 #nav a {
     color: var(--hr);
 }
 
+@media screen and (max-width:910px){
+    body {
+	width: 95%;
+    }
 
-@media screen and (min-width:910px){
-    body{
-        width: 80%;
+    #sidebar {
+	position: relative;
+	width: 100%;
+	text-align: center;
+    }
+
+    #content {
+	margin: auto;
+    }
+
+    #nav li {
+	display: inline;
+	border-left: var(--hr) dotted;
+	border-top: none;
     }
 }
