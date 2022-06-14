@@ -2,6 +2,14 @@
 <html>
   <head>
     $partial("templates/header.html")$
+
+    $if(twitter)$
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="https://obstacleallusion.com/$blog-route$" />
+    <meta name="twitter:title" content="$title$" />
+    <meta name="twitter:image" content="https://obstacleallusion.com/images/forest.jpg" />
+    $endif$
+    
     $if(math)$
     $partial("templates/math.html")$
     $endif$

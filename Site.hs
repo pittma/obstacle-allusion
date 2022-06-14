@@ -34,7 +34,7 @@ main =
       compile $
         pandocCompiler >>=
         saveSnapshot "posts" >>=
-        loadAndApplyTemplate "templates/post.html" (dateCtx <> defaultContext)
+        loadAndApplyTemplate "templates/post.html" (dateCtx <> defaultContext <> blogRouteCtx)
   
     match "*.html" $ do
       route toIdxPath

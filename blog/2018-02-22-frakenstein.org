@@ -1,5 +1,6 @@
 ---
 title: "I couldn't help myself, on “The Strange and Twisted Life of Frankenstein”"
+twitter: true
 publish: true
 ---
 
