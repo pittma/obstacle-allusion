@@ -1,26 +1,3 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    $partial("templates/header.html")$
-  </head>
-  <body>
-    $partial("templates/title.html")$
-    <div id="content">
-
-      <article>
-	<h1 class="post-title">Archive</h1>
-	$for(items)$
-	$if(publish)$
-	<a href="/$blog-route$"><h1 class="index-title">$title$</h1></a>
-	<div class="post-date">$date$</div>
-	$if(teaser)$
-	$teaser$
-	$endif$
-	<p><a class="more" href="/$blog-route$">Keep reading…</a></p>
-	$endif$
-	$endfor$
-      </article>
-
-    </div>
-  </body>
-</html>
+$partial("templates/header.html")$
+$partial("templates/post-list.html")$
+$partial("templates/footer.html")$
