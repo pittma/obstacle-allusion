@@ -1,9 +1,10 @@
 ---
 title: "Tell Me I'm Worthless"
 publish: true
+tags: book, review, cheese
 ---
 
-<center><img src="/images/worthless.jpg" width="400"></center>
+<img src="/images/worthless.jpg" width="200">
 
 Radical and terrifying. The book opens with a Deleuze quote, and (of
 course) I can't help but think about through that lens. The House is a

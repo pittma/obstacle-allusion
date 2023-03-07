@@ -12,6 +12,17 @@ import Text.Pandoc.SideNote (usingSideNotes)
 main :: IO ()
 main =
   hakyllWithBaseRules $ do
+
+    tags <- buildTags "blog/*" (fromCapture "tags/*/index.html")
+    tagsRules tags $ \tag pat -> do
+      route idRoute
+      compile $ do
+        posts <- recentFirst =<< loadAll pat
+        let context = listField "items" (tagsCtx tags <> constField "title" ("Posts tagged" ++ tag)) (return posts)
+        makeItem ""
+          >>= loadAndApplyTemplate "templates/tags.html" context
+
+    
     match "tufte/et-book/*/*" $ route $ customRoute $ drop 6 . toFilePath
     match "tufte/tufte.css" $ do
       route idRoute
@@ -21,7 +32,7 @@ main =
       route slugRoute
       compile $
         pandocWithSidenotes >>=
-        loadAndApplyTemplate "templates/post.html" (dateCtx <> defaultContext)
+        loadAndApplyTemplate "templates/post.html" (dateCtx <> defaultContext <> tagsField "tagss" tags)
 
     match "archive.html" $ do
       route toIdxPath
@@ -34,11 +45,18 @@ main =
 
     match "index.html" $ do
       route idRoute
-      compile $ asPostTemp defaultContext
+      compile $ do
+        posts <- take 5 <$> (recentFirst =<< loadAll "blog/*")
+        let context = listField "items" (dateCtx <> blogRouteCtx <> defaultContext) (return posts)
+        getResourceBody >>= applyAsTemplate context
 
     match "*.html" $ do
       route toIdxPath
       compile $ asPostTemp defaultContext
+
+
+tagsCtx :: Tags -> Context String
+tagsCtx tags = tagsField "tags" tags <> dateCtx <> blogRouteCtx <> defaultContext
 
 asPostTemp :: Context String -> Compiler (Item String)
 asPostTemp = asTempWithDefault "templates/post.html"
