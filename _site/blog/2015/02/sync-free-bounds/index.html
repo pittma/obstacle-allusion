@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    
+    
+    <title>Obstacle Allusion :: CRDTs, Bounds, SyncFree, and Invariants</title>
+    
+    
+    <meta name="viewport" content="width=device-width">
+
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/solarized.css">
+    <link rel="stylesheet" href="/tufte/tufte.css">
+    <link rel="stylesheet" href="/css/overrides.css">
+
+  
+
+  </head>
+  <body>
+
+    <div id="header">
+       <div id="navigation">
+         <b><a href="/">home</a></b>
+	 //
+         <b><a href="/about">about</a></b>
+	 //
+         <b><a href="/archive">archive</a></b>
+       </div>
+    </div>
+
+
+     <div id="content">
+
+       <h1>CRDTs, Bounds, SyncFree, and Invariants</h1>
+       
+       02-02-2015
+       
+       
+       |
+       <a title="All pages tagged &#39;CRDTs&#39;." href="/tags/CRDTs/index.html">CRDTs</a>, <a title="All pages tagged &#39;distsys&#39;." href="/tags/distsys/index.html">distsys</a>
+       
+	 
+       <article>
+	 <section>
+           
+
+           <p>I finally got around to watching the SyncFree consortium’s <a href="https://www.youtube.com/watch?v=1KP_pxFhlVU">talk about
+their work on CRDTs</a> at
+RICON 2014. Or at least half of it, rather, and I was really struck
+by their Bounded CRDTs<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">http://christophermeiklejohn.com/crdt/2014/07/22/readings-in-crdts.html<br />
+<br />
+</span></span> idea. The idea of a bounded CRDT is
+this: using a predefined <em>invariant</em>, you allow a certain count of
+“interactions” per replica. They are likened to leases or
+reservations in the talk. I like reservations better:</p>
+<p><img src="https://dl.dropboxusercontent.com/u/42154947/blog%20pics/ok.png" alt="Okay" />
+(edit 2023: I don’t have these drawings anymore, sorry)</p>
+<p>Here, in an over-simplified example, we have a counter. This counter
+changes with increments of 1, i.e. <code>counter++</code> or <code>counter--</code>. We
+have set an invariant of <code>cannot be &lt; 0</code>, and we use this invariant to
+make a <em>guarantee</em>. If each replica can only make 1 operation against
+the current known value (4), then we will never violate the invariant.
+However, should a second operation be performed on any replica, we are
+no longer convergent: the result of this would have counter’s value
+equal to -1:</p>
+<p><img src="https://dl.dropboxusercontent.com/u/42154947/blog%20pics/not%20ok.png" alt="Not Okay" />
+(edit 2023: I don’t have these drawings anymore, sorry)</p>
+<p>This is my primitive understanding, or my assumption, after watching
+20 minutes of the RICON talk on this today. What I’m most interested
+in is the bound that comes from the reservation count. This is the
+third time I’ll bring this paper up on this blog, which I can accept
+– maybe I’m a bit obsessed. The <a href="http://www.bailis.org/papers/ca-vldb2015.pdf">Peter Balis, et
+al. paper</a> on
+Coordination Avoidance. This paper, from a 10,000ft perspective, says
+only coordinate when you have to. Define invariants, coordinate when
+one is violated.</p>
+<p>It looks to me that a bounded CRDT is using this same concept, but
+using the invariant to avoid conflicts.</p>
+<p>As a background process, the “Reservation Manager” above doles out
+reservations, allowing each replica to operate on an object <em>N</em>
+times. When the Nth operation is reached, consensus is needed. If you
+are clever enough, and your strongly consistent Reservation Manager
+service can stay far enough ahead, you never have to sync.</p>
+<h3 id="here-comes-some-math">Here comes some math</h3>
+<p>Mathematically, CRDTs are all about a join semilattice, and so I’m
+about to attempt to surmise what the lattice is in the context of a
+bounded CRDT.</p>
+<p>Reservations is a semilattice <em><code>(R,∨)</code></em>. The current operation, if
+operations are <em><code>O⊆R</code></em> is <em><code>R ∨ O</code></em>. That is, the Least Upper Bound
+of <em><code>R</code></em> is the current Operation Count. This meets semilattice
+requirements of <a href="http://en.wikipedia.org/wiki/Semilattice#Algebraic_definition">commutativity, associativity, and
+idempotency</a>
+in that with each operation <em><code>⊤O</code></em> will always be equal to some
+element in <em><code>R</code></em> so long as <em><code>R</code></em> remains unbounded. Therefore <em><code>R v O</code></em> holds for any <em><code>O⊆R</code></em>. Like I said, if you are clever enough you
+can keep your Reservation Manager far enough ahead.</p>
+<p>This CRDT concept is a bit more complicated than the basic commutative
+or monotonic models, but is still farily easy to understand
+conceptually. I’m very interested in what comes next from the
+SyncFree humans, namely the adaptive stuff, which is used to reduce
+replicas – which decreases the LUB, which makes pre-determining
+reservations easier, which is 👍.</p>
+	 </section>
+       </article>
+
+     </div>
+
+     <div id="footer">
+       © dan pittman.<br>
+       I reserve the right to be wrong.
+     </div>
+
+  </body>
+
+</html>
+

@@ -1,14 +1,14 @@
 ---
 title: "The Real Numbers, Propositionally"
 math: true
+publish: true
+tags: math, category theory, type theory, hott
 ---
 
 #+TITLE: The Real Numbers, Propositionally
 
 *NOTE: If you come across this please know that it is a WIP. There is
 stuff in here that is /wrong/ because I was still learning it.*
-
-@@html:<!--more-->@@
 
 * Part I: Foundations
 
@@ -98,12 +98,12 @@ In topology, it is reasonable to say that a homotopy equivalence is an
 /isomorphism/. That is, an identity preserving map between our two
 spaces $X$ and $Y$.
 
-There are two take aways that I want to make sure we don't abscond from
+There are two take-aways that I want to make sure we don't abscond from
 this section without taking them with us.
 
 1. *A homotopy can, more generally, be thought of as a function
    /between/ functions.*
-1. *A homotopy can been seen as an isomorphism in the mathematical
+1. *A homotopy can be seen as an isomorphism in the mathematical
    field of topology, because it is /identity preserving/.*
 
 Now, this notion of functions, their inverses, and functions between
@@ -177,7 +177,7 @@ q &= g^{-1} \circ g
 \end{align*}
 $$
 
-Now, with our higher-groupoid structure, we can say things like:
+Now, with our higher groupoid structure, we can say things like:
 
 $$
 p \simeq q
@@ -204,7 +204,7 @@ concept of intensionality is how Per Martin-Löf originally conceived
 of type theory. In an intensional type theory, for two objects to be
 equivalent, they must, by definition, be the same thing. While
 Martin-Löf stated that intensional equality was an equality of
-meaning, i.e.~synonymy, its implications are such that two objects
+meaning, i.e. synonymy, its implications are such that two objects
 must be syntactically equivalent.
 
 However, in an /extensional/ type theory, equivalences can be
@@ -404,5 +404,3 @@ $$
 
 And given an $a : \text{CApprox}$ we take its limit:
 $lim : \text{CApprx} \rightarrow \mathbb{R}$ to produce our real number.
-
-

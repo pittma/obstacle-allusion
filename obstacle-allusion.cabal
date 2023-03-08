@@ -29,4 +29,6 @@ executable obstacle-allusion-exe
     , filepath
     , hakyll
     , hakyll-hacks
+    , pandoc
+    , pandoc-sidenote
   default-language: Haskell2010

@@ -1,33 +1,16 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    $partial("templates/header.html")$
-  </head>
-  <body>
-    $partial("templates/title.html")$
-    <div id="content">
+$partial("templates/header.html")$
 
-      <article>
-	<p style="border: var(--hr) dotted; padding: 5px;">
-	  This is the weblog of Dan Pittman. It is a collection of the
-	  incomplete thoughts, inspirations, and meanderings of a
-	  curious exister. Read more about this
-	  site <a href="about">here</a>.
-	</p>
+<div style="margin: auto; width: 85%;">
+<p style="border: rgb(231, 234, 236) dotted; padding: 5px;">This is the weblog of Dan Pittman. It is a collection of the
+incomplete thoughts, inspirations, and meanderings of a curious
+exister. Read more about this site <a href="/about">here</a>.</p>
 
-	$for(items)$
-	$if(publish)$
-	<a href="/$blog-route$"><h1 class="index-title">$title$</h1></a>
-	<div class="post-date">$date$</div>
-	$if(teaser)$
-	$teaser$
-	$endif$
-	<p><a class="more" href="/$blog-route$">Keep reading…</a></p>
-	<hr>
-	$endif$
-	$endfor$
-      </article>
+<h1 style="margin-top: 0">Recent Posts:</h1>
 
-    </div>
-  </body>
-</html>
+$partial("templates/post-list.html")$
+
+<p><a href="/archive">Complete Archive</a></p>
+</div>
+
+
+$partial("templates/footer.html")$
