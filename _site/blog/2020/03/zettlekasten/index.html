@@ -10,6 +10,12 @@
     
     <meta name="viewport" content="width=device-width">
 
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="/css/solarized.css">
     <link rel="stylesheet" href="/tufte/tufte.css">
@@ -33,7 +39,7 @@
 
      <div id="content">
 
-       <h1 style="margin-bottom: 0px;">Using Emacs's org-mode As Your Zettelkasten</h1>
+       <h1>Using Emacs's org-mode As Your Zettelkasten</h1>
        
        03-25-2020
        
@@ -51,7 +57,7 @@
            <p>I like to write. I don’t do it as often as I’d like to, but
 nonetheless I do like to do it. I’ve found that one of the best
 exercises for increasing the bandwidth of the passageway from my brain
-to my fingers is superfluous note taking. Couple this Good Thing with
+to my fingers is superfluous note-taking. Couple this Good Thing with
 a Could Appear Like A Good Thing But Is Dubious At Best Thing, namely
 ADHD/anxiety-induced procrastinatory over-organizing, one could
 imagine that how I choose to organize those notes is something that I
@@ -209,10 +215,10 @@ this note:</p>
 <h3 id="step-three-conversing-search">Step Three: Conversing (search)</h3>
 <p>Emacs Org mode has something called an <em>agenda</em>, that works as an
 aggregator over a collection of Org files. It can do some pretty
-amazing things like build a calendar for you, help you track your
-habits, or organize your todo list. For us, now, though, we’re going
-to use its tag and string matching searches. It does require a little
-setup in your <code>init.el</code> file to enable it, something like this:</p>
+amazing things like building a calendar for you, helping you track
+your habits, or organizing your todo list. For us, now, though, we’re
+going to use its tag and string matching searches. It does require a
+little setup in your <code>init.el</code> file to enable it, something like this:</p>
 <div class="sourceCode" id="cb7" data-org-language="emacs-lisp"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(global-set-key (kbd <span class="st">&quot;C-c a&quot;</span>) &#39;org-agenda)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> org-agenda-files &#39;(<span class="st">&quot;~/Dropbox/org/notes/todo.org&quot;</span> <span class="st">&quot;~/Dropbox/zet/&quot;</span>))</span></code></pre></div>
 <p>This results in the key sequence  <kbd>ctrl </kbd> +
@@ -228,7 +234,7 @@ the file containing it.</p>
 <h2 id="valedictions">Valedictions</h2>
 <p>I’ve only started to build up my own zettelkasten, but it truly feels
 like I’ve found a thing that fits, that <em>works</em>.</p>
-<p>One important factor I’ve found with note taking, at least for me, is
+<p>One important factor I’ve found with note-taking, at least for me, is
 for my note compendium to be append-only. I can’t let myself go back
 and pare down, edit and reëdit endlessly, because, unfailingly, I
 always end up deleting everything since of course no organizational

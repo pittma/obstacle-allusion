@@ -81,7 +81,7 @@ To put this is another way, and how I actually wrote this down in my
 notebook when I was searching for the intuition: Univalence is a
 topological bijection and that bijection is a valid isomorphism in the
 domain of pure topology.  There's a inside joke about topologists:
-Toplogists can't tell the difference between an donut and a coffee
+Toplogists can't tell the difference between a donut and a coffee
 mug.  This is precisely why!  The torus (donut) is homotopy
 equivalent, i.e. isomorphic, to a coffee mug.
 

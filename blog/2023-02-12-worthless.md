@@ -1,7 +1,7 @@
 ---
 title: "Tell Me I'm Worthless"
 publish: true
-tags: book, review, cheese
+tags: book, review
 ---
 
 <img src="/images/worthless.jpg" width="200">
@@ -15,12 +15,12 @@ expectations and so on. In a pair of words, Freudian
 psychoanalysis. Rumfitt gives her representation of this mental,
 sexual, and societal cell the weight that it requires; to her it's not
 an observation from the relatively safe space of the 1970's like D&G's
-was. No, she knows how dangerous and real The House is. Tell Me I'm
-Worthless is presentiment, not in language but in feeling. Portentous,
-not through data or rationality, but through fear. It evinces the
-existential terror we all felt on January 6th—we saw irrefutable truth
-that fascism is here, and real—but Rumfitt does it through the lens of
-someone whose whole life has been ruddered by that terror. She
-viscerally illustrates that fascism is the cop inside your head and is
-asking you to, in the words of Boston hardcore band Move, "kill the
-cop inside your head, decarcerate your mind."
+was. No, she knows how dangerous and real The House is. _Tell Me I'm
+Worthless_ is presentiment, not in language but in
+feeling. Portentous, not through data or rationality, but through
+fear. It evinces the existential terror we all felt on January 6th—we
+saw irrefutable truth that fascism is here, and real—but Rumfitt does
+it through the lens of someone whose whole life has been ruddered by
+that terror. She viscerally illustrates that fascism is the cop inside
+your head and is asking you to, in the words of Boston hardcore band
+Move, "kill the cop inside your head, decarcerate your mind."

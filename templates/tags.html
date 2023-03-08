@@ -1,8 +1,11 @@
 $partial("templates/header.html")$
-Posts tagged xxx:
 
-$for(items)$
-$title$
-$endfor$
+<div style="margin: auto; width 85%;">
+
+  <h1>$title$</h1>
+
+  $partial("templates/post-list.html")$
+
+</div>
 
 $partial("templates/footer.html")$

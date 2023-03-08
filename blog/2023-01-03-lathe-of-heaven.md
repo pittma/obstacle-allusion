@@ -1,21 +1,22 @@
 ---
 title: "The Lathe of Heaven"
 publish: true
+tags: book, review
 ---
 
-In This Life, philosopher Martin Hagglund makes the argument that the
-very fact that the time we have to be conscious here on Earth is
+In _This Life_, philosopher Martin Hagglund makes the argument that
+the very fact that the time we have to be conscious here on Earth is
 limited is what gives life value, what gives it meaning. If we have
-infinite time, then nothing matters. In The Lathe of Heaven, Le Guin
+infinite time, then nothing matters. In _The Lathe of Heaven_, Le Guin
 expands on this existential dialectic to explore not infinite time,
-but infinite opportunity. When a man is given infinite opportunity, it
-has the same effect—he can erase pain, but pleasure dies with it as
+but infinite _opportunity_. When a man is given infinite opportunity,
+it has the same effect—he can erase pain, but pleasure dies with it as
 well. The meaning we make from life is the synthesis of these
 opposites.
 
-<center><img src="/images/lathe.jpeg"></center>
+<img src="/images/lathe.jpeg">
 
-The Lathe of Heaven is the story of a man, George Orr, who has been
+The _Lathe of Heaven_ is the story of a man, George Orr, who has been
 blessed with the curse of effectual dreaming. When he dreams, reality
 shifts. Under governmental mandate, Orr must see a therapist after
 being caught borrowing a neighbor’s scrip card—he’s exceeded his
@@ -27,7 +28,8 @@ put Orr’s gift-curse to work to “fix” reality. Racism, hunger,
 overpopulation, malevolent extraterrestrials, all erased. Haber, a
 man, acts as God to flatten life’s curves. The book’s title itself
 acts as a warning to men like Haber, but also as a presentiment to the
-reader—a misquote from the writings of Chuang Tzu:
+reader—[a misquote from the writings of Chuang
+Tzu](https://en.wikipedia.org/wiki/The_Lathe_of_Heaven#Title):
 
 > To let understanding stop at what cannot be understood is a high
 > attainment. Those who cannot do it will be destroyed on the lathe of

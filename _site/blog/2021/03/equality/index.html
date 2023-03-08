@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    
+    
+    <title>Obstacle Allusion :: Thinking about Equality Philosophically</title>
+    
+    
+    <meta name="viewport" content="width=device-width">
+
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/solarized.css">
+    <link rel="stylesheet" href="/tufte/tufte.css">
+    <link rel="stylesheet" href="/css/overrides.css">
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+    "HTML-CSS": {
+    styles: {".MathJax_Preview": {visibility: "hidden"}}
+    },
+    tex2jax: {inlineMath: [["\[","\]"],["\\\(","\\\)"]]},
+    TeX: {extensions: ["AMSmath.js","AMSsymbols.js","/js/xypic.js"]}
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js"></script>
+  
+
+  </head>
+  <body>
+
+    <div id="header">
+       <div id="navigation">
+         <b><a href="/">home</a></b>
+	 //
+         <b><a href="/about">about</a></b>
+	 //
+         <b><a href="/archive">archive</a></b>
+       </div>
+    </div>
+
+
+     <div id="content">
+
+       <h1>Thinking about Equality Philosophically</h1>
+       
+       03-27-2021
+       
+       
+       |
+       <a title="All pages tagged &#39;math&#39;." href="/tags/math/index.html">math</a>, <a title="All pages tagged &#39;philosophy&#39;." href="/tags/philosophy/index.html">philosophy</a>
+       
+	 
+       <article>
+	 <section>
+           
+
+           <p>I’ve a long-running obsession with the meaning of equality, generally
+as it’s used in type theory, and about the divide between <em>intensional</em>
+equality and <em>extensional</em> equality. I’ve had discussions about this
+with real type theorists on IRC, and armchair theorists like myself,
+and I’m consistently left unsatisfied with the outcome. It seems that
+everyone has a different way of articulating this difference, and—as
+I’ve said this before—it’s been hard, at least in my experience, to
+really land on a common understanding. In this post, I’m going to give
+some background, then try and articulate my own way of thinking about
+this, and how I think it’s related to Kant’s ideas about synthetic and
+analytic utterances.</p>
+<h2 id="i.-equalitys-divide">I. Equality’s Divide</h2>
+<p>As I alluded to above, a lot of my interest in this topic is anchored
+in the distinction between intensional equality and extensional
+equality. The dropping of that anchor is frankly due to the struggle
+I’ve had myself to grasp this distinction which makes it difficult to
+make headway when you’re learning about type theory. To start, let’s
+try and give some meaningful definitions to these two types of
+equality:</p>
+<h3 id="intensional-equality">Intensional equality</h3>
+<p>An <em>intensional</em> equality is one whose definition ships with the<em>
+theory we’re working within. It’s an equality that is a part of our</em>
+<em>metatheory</em>.</p>
+<p>Let’s, for example, think about working in Agda’s type theory, which
+is <em>pretty</em> damn close to vanilla Martin-Löf dependent type theory
+with some inconsequential—at least for the topic at
+hand—embellishments. In Agda, equality is intensional, and the
+metatheory we’re working within when we’re writing Agda is the
+language itself. So another way to think about intensionality within
+Agda is that equality is /syntactic/. When we, for instance, prove
+something like <code>x + y ≡ y + x</code> in Agda, we’re tasked with showing the
+type checker that the normal forms of the left-hand side of <span class="math inline">\(\equiv\)</span>
+is syntactically identical to the right-hand side. The thing to keep
+in mind that we <em>don’t</em> have to do, is to illustrate that this is true
+for all x’s and y’s by listing them, one by one, doing the two
+additions with every possible combination of <code>x</code> and <code>y</code>, and showing
+they both have the same results. If we’re using the natural numbers as
+the type for <code>x</code> and <code>y</code>, this task would take an infinite span of
+time. Instead, we get to use induction to show that, through
+reduction, the syntax on the left side <strong>is the same</strong> as the syntax
+on the right side. This is because <code>≡</code>’s meaning is <em>intrinsic</em> to the
+theory of Agda. When we use Agda what we’re using is the syntax of the
+language, and that syntax comes with the notion of sameness, rather
+simply in that two things are the same if they’re literally the same
+normalized string of characters<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">This is a bit of an over simplification w/r/t what is
+essentially an implementation detail. In practice Agda isn’t literally
+comparing strings of characters, but a data structure which can be
+shown to a human in Agda’s syntax.<br />
+<br />
+</span></span>.</p>
+<h2 id="extensional-equality">Extensional Equality</h2>
+<p>With an extensional equality, the equality isn’t a part of theory, but
+instead verifies the sameness of the objects created within the
+theory. Take for example extensional set theory. The way to determine
+that sets are equal is by determining that all of their elements are
+equal. It requires enumerating all the constituent pieces and testing
+them one by one, also known as “point-wise”.</p>
+<h2 id="synthetic-analytic-intensional-extensional">Synthetic, Analytic, Intensional, Extensional</h2>
+<p>Western Philosophy’s most famous lover of rules is, far and away,
+Immanuel Kant.</p>
+<p>Kant is the originator of the synthetic and analytic
+divide. Essentially, an analytic sentence or expression is inherently
+verifiable, e.g., “all pediatricians are doctors”, while a synthetic
+expression requires exterior verification, like “all pediatricians are
+rich”, to verify this statement, we’d have to talk with all
+pediatricians, while with the former we know it to be true just by the
+meaning of the words.</p>
+<p>This is, I’d argue, very closely related to the notion of intensional
+vs. extensional equality, if not just a mathematician’s way of saying
+the same thing that Kant was trying to say. The real question lies,
+though, in what system would you use to verify this equational theory?</p>
+	 </section>
+       </article>
+
+     </div>
+
+     <div id="footer">
+       © dan pittman.<br>
+       I reserve the right to be wrong.
+     </div>
+
+  </body>
+
+</html>
+

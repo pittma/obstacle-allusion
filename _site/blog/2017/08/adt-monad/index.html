@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    
+    
+    <title>Obstacle Allusion :: An Algebraic Data Type's Monad</title>
+    
+    
+    <meta name="viewport" content="width=device-width">
+
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/solarized.css">
+    <link rel="stylesheet" href="/tufte/tufte.css">
+    <link rel="stylesheet" href="/css/overrides.css">
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+    "HTML-CSS": {
+    styles: {".MathJax_Preview": {visibility: "hidden"}}
+    },
+    tex2jax: {inlineMath: [["\[","\]"],["\\\(","\\\)"]]},
+    TeX: {extensions: ["AMSmath.js","AMSsymbols.js","/js/xypic.js"]}
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js"></script>
+  
+
+  </head>
+  <body>
+
+    <div id="header">
+       <div id="navigation">
+         <b><a href="/">home</a></b>
+	 //
+         <b><a href="/about">about</a></b>
+	 //
+         <b><a href="/archive">archive</a></b>
+       </div>
+    </div>
+
+
+     <div id="content">
+
+       <h1>An Algebraic Data Type's Monad</h1>
+       
+       08-02-2017
+       
+       
+       |
+       <a title="All pages tagged &#39;math&#39;." href="/tags/math/index.html">math</a>, <a title="All pages tagged &#39;category theory&#39;." href="/tags/category%20theory/index.html">category theory</a>
+       
+	 
+       <article>
+	 <section>
+           
+
+           <p>I watched Dr. Emily Riehl’s Compose Conf talk<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote"><a href="https://www.youtube.com/watch?v=6t6bsWVOIzs">A Categorical View of Computational
+Effects</a><br />
+<br />
+</span></span> last night
+and a new intuition emerged. The purpose of the talk was to explicate
+the categorical notion of a monad, and while watching it, I was struck
+with the realization of how a monad arises from an algebraic data
+type.</p>
+<h2 id="prereqs">Prereqs</h2>
+<p>In her talk, she first discusses <span class="math inline">\(T\)</span> as a computation, and defines a
+<span class="math inline">\(T\)</span> as a monad: something that can take an <span class="math inline">\(A\)</span> and lift it to a
+<span class="math inline">\(T(A)\)</span>, like this:</p>
+<p><span class="math display">\[
+A \rightarrow T(A)
+\]</span></p>
+<p><em>NB: There is another operation that comes with a monad, <code>bind</code>, but
+we’ll skip that for now.</em></p>
+<p>The canonical example used through the first half of the talk is a
+<span class="math inline">\(\text{List}\)</span>: A function from <span class="math inline">\(A \rightarrow T(A)\)</span> could be a
+function from an <span class="math inline">\(A\)</span> to a <span class="math inline">\(List\)</span> of <span class="math inline">\(A\)</span>’s where <span class="math inline">\(T\)</span> is the
+<em>computation</em> which constructs a list of <span class="math inline">\(A\)</span>’s. That is, <span class="math inline">\(A \rightarrow T(A)\)</span> is simply a more general version of <span class="math inline">\(A \rightarrow List(A)\)</span>.</p>
+<p>She goes on to use the notation of <span class="math inline">\(\leadsto\)</span> to denote a “program”
+which contains one of these lift operations, but with <span class="math inline">\(\leadsto\)</span>, we
+elide the <span class="math inline">\(T\)</span>:</p>
+<p><span class="math display">\[\
+A \rightarrow T(B) = A \leadsto B
+\]</span></p>
+<p>This notation is meant to denote a “weak” map between <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span>, in
+that it’s not a complete <span class="math inline">\(A \rightarrow B\)</span>, due to the fact that it
+requires the computation <span class="math inline">\(T\)</span>. This lift from <span class="math inline">\(A\)</span> to <span class="math inline">\(T\)</span> of <span class="math inline">\(B\)</span> is
+called a <em>Kleisli</em> arrow.</p>
+<h2 id="an-adt-monad">An ADT Monad</h2>
+<p>Later in the talk, she defines a function from <span class="math inline">\(A\)</span> to <span class="math inline">\(A + \bot\)</span>:</p>
+<p><span class="math display">\[\
+A \rightarrow A + \{\bot\}
+\]</span></p>
+<p>This should look familiar—it contains a <span class="math inline">\(+\)</span> after all! It’s an
+algebraic data type (ADT)—a sum type to be specfic. It can give us
+either an <span class="math inline">\(A\)</span> or <span class="math inline">\({\bot}\)</span>; <span class="math inline">\(\bot\)</span> means “bottom” or <code>false</code> in this
+context. It would look something like this in Haskell:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Maybe</span> a <span class="ot">=</span> <span class="dt">Nothing</span> <span class="op">|</span> <span class="dt">Just</span> a</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a</span></code></pre></div>
+<p>And as we know, <code>Maybe</code> admits a monad where if we have an <code>a</code>, we
+apply our lift to it to get a <code>Just a</code>. In Haskell, this lift is
+called <code>return</code>, and made available in the Monad typeclass:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span><span class="ot"> ::</span> <span class="dt">Monad</span> m <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> m a</span></code></pre></div>
+<p>Which, if we squint, looks an awful lot like <code>A -&gt; T(A)</code>. For
+edification purposes, our definition of <code>return</code> for <code>Maybe</code> and the
+other requisite pieces of a Monad in Haskell are below.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> <span class="dt">Maybe</span> <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> <span class="ot">=</span> <span class="dt">Just</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">Just</span> x) <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> f x</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Nothing</span> <span class="op">&gt;&gt;=</span> _ <span class="ot">=</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>If you’re still squinting, you can start to see how:</p>
+<ul>
+<li>Our ADT becomes <span class="math inline">\(T\)</span>, the <em>computation</em> which can give us either our
+<code>a</code>, or <code>Nothing</code>.</li>
+<li>Using Dr. Riehl’s notation, we could denote <code>f</code> mathematically as
+<span class="math inline">\(f : A \leadsto A\)</span></li>
+</ul>
+	 </section>
+       </article>
+
+     </div>
+
+     <div id="footer">
+       © dan pittman.<br>
+       I reserve the right to be wrong.
+     </div>
+
+  </body>
+
+</html>
+

@@ -6,7 +6,7 @@ subtitle: (And some editorializing on the foundations of mathematics)
 I like to write. I don't do it as often as I'd like to, but
 nonetheless I do like to do it. I've found that one of the best
 exercises for increasing the bandwidth of the passageway from my brain
-to my fingers is superfluous note taking. Couple this Good Thing with
+to my fingers is superfluous note-taking. Couple this Good Thing with
 a Could Appear Like A Good Thing But Is Dubious At Best Thing, namely
 ADHD/anxiety-induced procrastinatory over-organizing, one could
 imagine that how I choose to organize those notes is something that I
@@ -196,10 +196,10 @@ And if I'd like to follow it, I can just do @@html: <kbd>@@ctrl@@html:
 
 Emacs Org mode has something called an /agenda/, that works as an
 aggregator over a collection of Org files. It can do some pretty
-amazing things like build a calendar for you, help you track your
-habits, or organize your todo list. For us, now, though, we're going
-to use its tag and string matching searches. It does require a little
-setup in your ~init.el~ file to enable it, something like this:
+amazing things like building a calendar for you, helping you track
+your habits, or organizing your todo list. For us, now, though, we're
+going to use its tag and string matching searches. It does require a
+little setup in your ~init.el~ file to enable it, something like this:
 
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-c a") 'org-agenda)
@@ -226,7 +226,7 @@ the file containing it.
 I've only started to build up my own zettelkasten, but it truly feels
 like I've found a thing that fits, that /works/.
 
-One important factor I've found with note taking, at least for me, is
+One important factor I've found with note-taking, at least for me, is
 for my note compendium to be append-only. I can't let myself go back
 and pare down, edit and reëdit endlessly, because, unfailingly, I
 always end up deleting everything since of course no organizational

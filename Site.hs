@@ -15,10 +15,11 @@ main =
 
     tags <- buildTags "blog/*" (fromCapture "tags/*/index.html")
     tagsRules tags $ \tag pat -> do
+      let title = "Posts tagged \"" ++ tag ++ "\""
       route idRoute
       compile $ do
         posts <- recentFirst =<< loadAll pat
-        let context = listField "items" (tagsCtx tags <> constField "title" ("Posts tagged" ++ tag)) (return posts)
+        let context = constField "title" title <> listField "items" (tagsCtx tags)  (return posts)
         makeItem ""
           >>= loadAndApplyTemplate "templates/tags.html" context
 
@@ -32,7 +33,7 @@ main =
       route slugRoute
       compile $
         pandocWithSidenotes >>=
-        loadAndApplyTemplate "templates/post.html" (dateCtx <> defaultContext <> tagsField "tagss" tags)
+        loadAndApplyTemplate "templates/post.html" (dateCtx <> tagsField "tags" tags <> defaultContext)
 
     match "archive.html" $ do
       route toIdxPath

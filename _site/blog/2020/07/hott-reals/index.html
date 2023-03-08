@@ -10,6 +10,12 @@
     
     <meta name="viewport" content="width=device-width">
 
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="/css/solarized.css">
     <link rel="stylesheet" href="/tufte/tufte.css">
@@ -47,13 +53,13 @@
 
      <div id="content">
 
-       <h1 style="margin-bottom: 0px;">The Real Numbers, Propositionally</h1>
+       <h1>The Real Numbers, Propositionally</h1>
        
        07-01-2020
        
        
        |
-       
+       <a title="All pages tagged &#39;math&#39;." href="/tags/math/index.html">math</a>, <a title="All pages tagged &#39;category theory&#39;." href="/tags/category%20theory/index.html">category theory</a>, <a title="All pages tagged &#39;type theory&#39;." href="/tags/type%20theory/index.html">type theory</a>, <a title="All pages tagged &#39;hott&#39;." href="/tags/hott/index.html">hott</a>
        
 	 
        <article>
@@ -62,7 +68,6 @@
 
            <p><strong>NOTE: If you come across this please know that it is a WIP. There is
 stuff in here that is <em>wrong</em> because I was still learning it.</strong></p>
-<p><!--more--></p>
 <h1 id="part-i-foundations">Part I: Foundations</h1>
 <h2 id="introduction">Introduction</h2>
 <p>If some framework for reasoning about mathematical objects posits that
@@ -130,12 +135,12 @@ H(1, X) &amp;= g \circ f
 <p>In topology, it is reasonable to say that a homotopy equivalence is an
 <em>isomorphism</em>. That is, an identity preserving map between our two
 spaces <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
-<p>There are two take aways that I want to make sure we don’t abscond from
+<p>There are two take-aways that I want to make sure we don’t abscond from
 this section without taking them with us.</p>
 <ol type="1">
 <li><strong>A homotopy can, more generally, be thought of as a function
 <em>between</em> functions.</strong></li>
-<li><strong>A homotopy can been seen as an isomorphism in the mathematical
+<li><strong>A homotopy can be seen as an isomorphism in the mathematical
 field of topology, because it is <em>identity preserving</em>.</strong></li>
 </ol>
 <p>Now, this notion of functions, their inverses, and functions between
@@ -190,7 +195,7 @@ q &amp;: A \simeq B \\
 q &amp;= g^{-1} \circ g
 \end{align*}
 \]</span></p>
-<p>Now, with our higher-groupoid structure, we can say things like:</p>
+<p>Now, with our higher groupoid structure, we can say things like:</p>
 <p><span class="math display">\[
 p \simeq q
 \]</span></p>
@@ -210,7 +215,7 @@ concept of intensionality is how Per Martin-Löf originally conceived
 of type theory. In an intensional type theory, for two objects to be
 equivalent, they must, by definition, be the same thing. While
 Martin-Löf stated that intensional equality was an equality of
-meaning, i.e.~synonymy, its implications are such that two objects
+meaning, i.e. synonymy, its implications are such that two objects
 must be syntactically equivalent.</p>
 <p>However, in an <em>extensional</em> type theory, equivalences can be
 expressed as simply another type—a proposition of equality.</p>

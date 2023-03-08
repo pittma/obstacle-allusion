@@ -1,13 +1,41 @@
+:root {
+    --bg-color: rgb(20, 41, 64);
+    --base-color: rgb(231, 234, 236);
+    --accent-color: rgb(174, 114, 48);
+}
+
 body {
-    color: rgb(231, 234, 236);
-    background-color: rgb(20, 41, 64);
+    font-family: 'Spectral', serif;
+    color: var(--base-color);
+    background-color: var(--bg-color);
+}
+
+h1 {
+    margin-bottom: 0;
+}
+
+article {
+    padding: 0;
 }
 
 a:link, a:visited {
-    color: rgb(174, 114, 48);
+    color: var(--accent-color);
     background: none;
     text-shadow: none;
     text-decoration: underline;
+}
+
+blockquote {
+    margin: 0;
+
+}
+
+blockquote p {
+    padding: 5px;
+    border-left: var(--accent-color) 5px solid;
+    background-color: var(--base-color);
+    color: var(--bg-color);
+    font-style: italic;
 }
 
 #footer {
@@ -32,4 +60,13 @@ kbd {
     text-shadow: 0 1px 0 #fff;
     line-height: 1.4;
     white-space: nowrap;
+}
+
+.pull {
+    font-size: 2em;
+    font-style: italic;
+    font-weight: bold;
+    padding: 10px;
+    border-top: var(--accent-color) 3px solid;
+    border-bottom: var(--accent-color) 3px solid;
 }

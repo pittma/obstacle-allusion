@@ -157,7 +157,7 @@ draw it out!
    \end{xy}
    $$
 
-1. Now, for the sake of our explanation, lets say our third parameter
+1. Now, for the sake of our explanation, let's say our third parameter
    `p a b` can be thought of as a more general way of writing the type
    of a function from `a` to `b`. We can think about it this way by
    replacing `p` with a concrete type constructor, the function type

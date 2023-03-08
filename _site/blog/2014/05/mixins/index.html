@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    
+    
+    <title>Obstacle Allusion :: Some Readings on Mixins</title>
+    
+    
+    <meta name="viewport" content="width=device-width">
+
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/solarized.css">
+    <link rel="stylesheet" href="/tufte/tufte.css">
+    <link rel="stylesheet" href="/css/overrides.css">
+
+  
+
+  </head>
+  <body>
+
+    <div id="header">
+       <div id="navigation">
+         <b><a href="/">home</a></b>
+	 //
+         <b><a href="/about">about</a></b>
+	 //
+         <b><a href="/archive">archive</a></b>
+       </div>
+    </div>
+
+
+     <div id="content">
+
+       <h1>Some Readings on Mixins</h1>
+       
+       05-27-2014
+       
+       
+       |
+       <a title="All pages tagged &#39;programming languages&#39;." href="/tags/programming%20languages/index.html">programming languages</a>
+       
+	 
+       <article>
+	 <section>
+           
+
+           <p>To me, Mixins were always a simple, stateless collection of loosely
+related methods that could be included in a class. I mean stateless in
+that they hold no state of their own, but rather that they assume a
+given state.</p>
+<p>As an example, this is the perspective Ruby takes on the topic:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">module</span> <span class="dt">TestModule</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>   <span class="cf">def</span> <span class="fu">test</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>     <span class="fu">puts</span> <span class="vs">&#39;hi&#39;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>   <span class="cf">end</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> <span class="cf">end</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> <span class="cf">class</span> <span class="dt">TestClass</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>   <span class="fu">include</span> <span class="dt">TestModule</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> <span class="cf">end</span></span></code></pre></div>
+<pre><code>irb&gt; TestClass.new.test
+irb&gt; &quot;hi&quot;</code></pre>
+<p>Although quite simple, this perspective is misleading according to the
+classical definition of mixins. Modern mixin’s original definition
+came from a paper written by Gilad Bracha and William Cook, and their
+basis is this:</p>
+<p>A mixin is an abstract subclass; i.e. a subclass definition that may
+be applied to different superclasses to create a related family of
+modified classes. For example, a mixin might be defined that adds a
+border to a window class; this mixin could be applied to any kind of
+window to create a bordered-window class.</p>
+<p>The bulk of this research came from a paper that Richard P. Gabriel
+wrote that is actually about the philosophy of science / engineering,
+where context is all based around mixins. Because I’m obsessed, I went
+and read the bulk of all the papers he cites while illustrating his,
+“engineering comes first in computer science” theories. Although these
+posts won’t cover any of his fascinating perspectives on this
+philosophy, I’d still definitely recommend reading his paper. He also
+did a talk on the paper, or at least what inspired him to write the
+paper: incommensurability.</p>
+<p>To begin the delving into mixins, according to Gabriel, we have to
+start with Warren Teitelman, a PhD candidate at MIT in 1966. More than
+twenty years before the seminal Bracha and Cook paper, Teitelman wrote
+his dissertation on a system called PILOT. PILOT uses something called
+Teitelman called advice. Here’s a reductionist explanation taken from
+the paper’s abstract:</p>
+<p>Advising consists of inserting new procedures at any or all of the
+entry or exit points to a particular procedure (or class of
+procedures).</p>
+<p>Teitelman’s thesis is verbose ~200 pages, of which I did not read even
+half. Though, in skimming through, I did stop and read all of chapter
+5: Experiments With a Question Answer System. Using a couple of fairly
+complex logic problems based around a parallel to McCarthy’s Airport
+Problem<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote">This is not the googlable “airport problem”, this is why
+I’ve included the link to the paper where McCarthy first supposes
+the problem in 1959. One of the first of its kind.<br />
+<br />
+</span></span>, Teitelman shows how tests and protections (for example) can
+be predefined as advice, and then a function can use this advice
+either before or after its invocation. It is even possible for advice
+block a function from being invoked at all. The clearest example from
+the paper is still a little murky to me, even after a second and third
+read though, so rather than attempting to delve into the weeds, I’ll
+try and explain the best I can at a high level.</p>
+<p>Let’s assume a function whose job is to solve a problem by recursively
+running itself, and, if just the right input is given, it can get
+stuck in an infinite loop. Using Teitelman’s advice, a programmer can
+predetermine some invariants to run at the functions entry and exit
+points to test something like, “how many times have I called myself?”
+or “have I adequately solved this problem and can I stop the recursive
+calls?”. The programmer writes these advice procedures in a generic
+way so that they can be reused by any number of functions who may meet
+the same requirements.</p>
+<pre><code>(tell solution1, (before number advice),
+If (countf history ((solution1 -)) is greater than 2, then quit)</code></pre>
+<p>This is some code from the example above, where “number” is the number
+of times the recursive function has called itself:</p>
+<p>The user tells PILOT to modify SOLUTION1. The phrase “(before number
+advice)” tells PILOT to insert this advice immediately before the
+advice containing the key word “number”.</p>
+<p>The first thought to came to mind after skimming this paper was Python
+decorators. Though not exactly PILOT, I do see some strong
+similarities. Let’s take the example above, at least the part where we
+block a call to a function if its invocation count is greater than a
+pre-determined value. This requires a bit of an understanding of
+Python and its decorators<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Python decorators are this thing where functions can be
+passed as parameters to generic functions that utilize the
+<strong>call</strong>() method on the type Function. Reminds me, in a way, to a
+Ruby function that takes a block (Proc).<br />
+<br />
+</span></span>, but let’s just assume you “get it”, now
+that I’ve briefly described PILOT.</p>
+<p>First we’ll set up a class whose constructor accepts a function and a
+count. The class then sets these properties as instance variables.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Decorator(<span class="bu">object</span>):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, func, count <span class="op">=</span> <span class="dv">0</span>):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.count <span class="op">=</span> <span class="dv">0</span> <span class="kw">or</span> count</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.func <span class="op">=</span> func</span></code></pre></div>
+<p>Next, we’ll override the <code>__call__()</code> method on the class. This is the
+method that is invoked on a decorator.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>     <span class="va">self</span>.count <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="cf">if</span> <span class="va">self</span>.count <span class="op">&lt;</span> <span class="dv">5</span>:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>         <span class="va">self</span>.func()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     <span class="cf">else</span>:</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>         <span class="bu">print</span> <span class="st">&#39;not calling&#39;</span></span></code></pre></div>
+<p>And last, we define a recursive method, and decorate it with our
+<code>Decorator</code> class.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">@Decorator</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> recurse():</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>     <span class="bu">print</span> <span class="st">&#39;recurse called&#39;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>     recurse()</span></code></pre></div>
+<p>As expected, the decorator blocks the call once count is greater than
+five. Output:</p>
+<pre><code>recurse called
+recurse called
+recurse called
+recurse called
+not calling</code></pre>
+<p>On <code>recurse()</code>’s fifth invocation, it is not invoked, and the program
+exits. To me, this is exactly the type of invariant that Teitelman is
+describing in the PILOT examples. While not quite aligned with the
+modern perspective of multiple-inheritance based mixins, this is a
+clear precursor to the type of reusable, common functionality we
+understand as mixins today; at least on a much smaller (per function)
+scale.</p>
+<p>(On a side note, how cool is that the same instance is passed to each
+call to <code>Decorator</code>. I was surprised that it was this simple to
+implement.)</p>
+<p>Up next in the mixin rabbit trail is Flavors, another Lisp based
+precursor to the Bracha and Cook paper, similar in pattern (before and
+after), but quite different in concept.</p>
+	 </section>
+       </article>
+
+     </div>
+
+     <div id="footer">
+       © dan pittman.<br>
+       I reserve the right to be wrong.
+     </div>
+
+  </body>
+
+</html>
+
