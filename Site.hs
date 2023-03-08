@@ -23,8 +23,6 @@ main =
         makeItem ""
           >>= loadAndApplyTemplate "templates/tags.html" context
 
-    
-    match "tufte/et-book/*/*" $ route $ customRoute $ drop 6 . toFilePath
     match "tufte/tufte.css" $ do
       route idRoute
       compile copyFileCompiler

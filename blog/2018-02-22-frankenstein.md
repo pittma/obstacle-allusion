@@ -1,6 +1,5 @@
 ---
 title: "On “The Strange and Twisted Life of Frankenstein”"
-twitter: true
 publish: true
 tags: book, analysis
 ---
