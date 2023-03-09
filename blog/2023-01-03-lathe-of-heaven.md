@@ -1,6 +1,7 @@
 ---
 title: "The Lathe of Heaven"
 publish: true
+track: true
 tags: book, review
 ---
 

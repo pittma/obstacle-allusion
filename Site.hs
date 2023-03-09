@@ -14,14 +14,17 @@ main =
   hakyllWithBaseRules $ do
 
     tags <- buildTags "blog/*" (fromCapture "tags/*/index.html")
+
     tagsRules tags $ \tag pat -> do
       let title = "Posts tagged \"" ++ tag ++ "\""
       route idRoute
       compile $ do
         posts <- recentFirst =<< loadAll pat
-        let context = constField "title" title <> listField "items" (tagsCtx tags)  (return posts)
-        makeItem ""
-          >>= loadAndApplyTemplate "templates/tags.html" context
+        let context =
+              constField "track" "true" <>
+              constField "title" title <>
+              listField "items" (tagsCtx tags) (return posts)
+        makeItem "" >>= loadAndApplyTemplate "templates/tags.html" context
 
     match "tufte/tufte.css" $ do
       route idRoute
@@ -31,13 +34,20 @@ main =
       route slugRoute
       compile $
         pandocWithSidenotes >>=
-        loadAndApplyTemplate "templates/post.html" (dateCtx <> tagsField "tags" tags <> defaultContext)
+        loadAndApplyTemplate
+          "templates/post.html"
+          (dateCtx <> tagsField "tags" tags <> defaultContext)
 
     match "archive.html" $ do
       route toIdxPath
       compile $ do
         posts <- recentFirst =<< loadAll "blog/*"
-        let context = listField "items" (dateCtx <> blogRouteCtx <> defaultContext) (return posts)
+        let context =
+              defaultContext <>
+              listField
+                "items"
+                (dateCtx <> blogRouteCtx <> defaultContext)
+                (return posts)
         getResourceBody >>= applyAsTemplate context
 
     match "templates/*" $ compile templateCompiler
@@ -46,9 +56,14 @@ main =
       route idRoute
       compile $ do
         posts <- take 5 <$> (recentFirst =<< loadAll "blog/*")
-        let context = listField "items" (dateCtx <> blogRouteCtx <> defaultContext) (return posts)
+        let context =
+              defaultContext <>
+              listField
+                "items"
+                (dateCtx <> blogRouteCtx <> defaultContext)
+                (return posts)
         getResourceBody >>= applyAsTemplate context
-
+  
     match "*.html" $ do
       route toIdxPath
       compile $ asPostTemp defaultContext

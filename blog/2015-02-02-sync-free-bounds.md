@@ -1,6 +1,7 @@
 ---
 title:  "CRDTs, Bounds, SyncFree, and Invariants"
 publish: true
+track: true
 tags: CRDTs, distsys
 ---
 

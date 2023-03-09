@@ -2,6 +2,7 @@
 title: "The Real Numbers, Propositionally"
 math: true
 publish: true
+track: true
 tags: math, category theory, type theory, hott
 ---
 

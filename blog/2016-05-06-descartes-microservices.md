@@ -1,6 +1,7 @@
 ---
 title: "On Descartes and Microservices"
 publish: true
+track: true
 tags: programming, philosophy
 ---
 

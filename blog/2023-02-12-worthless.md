@@ -1,6 +1,7 @@
 ---
 title: "Tell Me I'm Worthless"
 publish: true
+track: true
 tags: book, review
 ---
 
@@ -13,10 +14,10 @@ and it represents all that Deleuze and Guattari originally intended:
 gender and sexual normativity, fascism, the strictures of societal
 expectations and so on. In a pair of words, Freudian
 psychoanalysis. Rumfitt gives her representation of this mental,
-sexual, and societal cell the weight that it requires; to her it's not
-an observation from the relatively safe space of the 1970's like D&G's
-was. No, she knows how dangerous and real The House is. _Tell Me I'm
-Worthless_ is presentiment, not in language but in
+sexual, and societal cell the weight that it requires; to her, it's
+not an observation from the relatively safe space of the 1970s like
+D&G's was. No, she knows how dangerous and real The House is. _Tell Me
+I'm Worthless_ is presentiment, not in language but in
 feeling. Portentous, not through data or rationality, but through
 fear. It evinces the existential terror we all felt on January 6th—we
 saw irrefutable truth that fascism is here, and real—but Rumfitt does
