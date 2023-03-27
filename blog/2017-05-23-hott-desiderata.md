@@ -1,6 +1,7 @@
 ---
 title: "Homotopy Type Theory Desiderata"
 track: true
+publish: true
 math: true
 ---
 

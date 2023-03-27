@@ -1,6 +1,7 @@
 ---
 title: "On Profunctors, Abruptly"
 track: true
+publish: true
 math: true
 ---
 
