@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    
+    
+    <title>Obstacle Allusion :: Using Type-Level Programming in Rust to Make Safer Hardware Abstractions</title>
+    
+    
+    <meta name="viewport" content="width=device-width">
+
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/solarized.css">
+    <link rel="stylesheet" href="/tufte/tufte.css">
+    <link rel="stylesheet" href="/css/overrides.css">
+
+  
+
+  
+
+  </head>
+  <body>
+
+    <div id="header">
+       <div id="navigation">
+         <b><a href="/">home</a></b>
+	 //
+         <b><a href="/about">about</a></b>
+	 //
+         <b><a href="/archive">archive</a></b>
+       </div>
+    </div>
+
+
+     <div id="content">
+
+       <h1>Using Type-Level Programming in Rust to Make Safer Hardware Abstractions</h1>
+       
+       10-25-2019
+       
+       
+       |
+       <a title="All pages tagged &#39;programming&#39;." href="/tags/programming/index.html">programming</a>, <a title="All pages tagged &#39;rust&#39;." href="/tags/rust/index.html">rust</a>, <a title="All pages tagged &#39;formal methods&#39;." href="/tags/formal%20methods/index.html">formal methods</a>
+       
+	 
+       <article>
+	 <section>
+           
+
+           <p>Introducing
+<a href="https://github.com/auxoncorp/bounded-registers"><code>bounded-registers</code></a>.</p>
+<p>In the world of systems programming where one may find themselves
+writing hardware drivers or interacting directly with memory-mapped
+devices, that interaction is almost always through memory-mapped
+registers provided by the hardware. We typically interact with these
+things through bitwise operations on some fixed-width numeric type.</p>
+<p>For instance, imagine an 8-bit register with three fields:</p>
+<pre><code>+----------+------+-----------+---------+
+| (unused) | Kind | Interrupt | Enabled |
++----------+------+-----------+---------+
+   5-7       2-4        1          0</code></pre>
+<p>The number below the field name prescribes the bits used by that field
+in the register. To enable this register, one would write the value
+<code>1</code>, represented in binary as <code>0000_0001</code>, to set the enabled field’s
+bit. Often, though, we also have an existing configuration in the
+register that we don’t want to disturb. Say we want to enable
+interrupts on our device above but also want to be sure that the
+device itself remains enabled. To do that, we must combine the
+Interrupt field’s value with the <code>Enabled</code> field’s value. We’d do that
+with bitwise operations:</p>
+<pre><code>1 | (1 &lt;&lt; 1)</code></pre>
+<p>This gives us the binary value <code>0000_0011</code> by <code>or</code>-ing 1 with 2, which
+we get by shifting 1 left by 1. We can write this to our register,
+leaving it enabled but also enabling interrupts.</p>
+<p>This is a lot to keep in our heads, especially when dealing with
+potentially 100s of registers for a complete system. In practice, we
+do this with mnemonics which track a field’s position in a register
+and how wide that field is—i.e. what’s its <em>upper bound</em>?</p>
+<p>Here’s an example of one of these mnemonics, they’re C macros that
+replace their occurrences with the code on the right-hand side. This
+is our shorthand for the register we laid out above. The left-hand
+side of the <code>&amp;</code> puts us in position for that field and the right-hand
+side limits us to only that field’s bits.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_ENABLED_FIELD(x) (x &lt;&lt; 0) &amp; 1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_INTERRUPT_FIELD(x) (x &lt;&lt; 1) &amp; 2</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_KIND_FIELD(x) (x &lt;&lt; 2) &amp; (7 &lt;&lt; 2)</span></span></code></pre></div>
+<p>We’d then use these to abstract over the derivation of a register’s
+value with something like:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> set_reg_val<span class="op">(</span>reg<span class="op">*</span> u8<span class="op">,</span> val u8<span class="op">);</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>fn enable_reg_with_interrupt<span class="op">(</span>reg<span class="op">*</span> u8<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    set_reg_val<span class="op">(</span>reg<span class="op">,</span> REG_ENABLED_FIELD<span class="op">(</span><span class="dv">1</span><span class="op">)</span> <span class="op">|</span> REG_INTERRUPT_FIELD<span class="op">(</span><span class="dv">1</span><span class="op">));</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>And this is the state of the art, really. In fact, this is how the
+bulk of the drivers appear in the Linux kernel.</p>
+<p><strong>Is there a better way?</strong> Consider the boon to safety and expressibility
+if our type system was one borne out of modern programming languages
+research. That is, what could we do with a richer, more expressive
+type system to make this process safer and more tenable?</p>
+<h2 id="level-i-using-rust-to-talk-to-hardware">Level I: Using Rust to talk to hardware</h2>
+<p>With Rust we can use data structures to represent fields, we can
+attach them to specific registers, and we can provide concise and
+sensible ergonomics with interacting with the hardware. This first
+example uses the most basic facilities provided by Rust, but
+regardless, just the added structure alleviates some of the density
+from the C example above. Now, a field is a named thing, not a number
+derived from shadowy bitwise operators, and registers are types with
+state—one extra layer of abstraction over the hardware.</p>
+<p>Continuing with our register above as an example:</p>
+<pre><code>+----------+------+-----------+---------+
+| (unused) | Kind | Interrupt | Enabled |
++----------+------+-----------+---------+
+   5-7       2-4        1          0</code></pre>
+<p>How might we want to express such a thing in Rust types?</p>
+<p>We’ll start in a similar way, by defining constants for each field’s
+<em>offset</em>—that is, how far it is from the least significant bit—and its
+mask. A <em>mask</em> is a value whose binary representation can be used to
+update or read the field from inside the register.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ENABLED_MASK<span class="op">:</span> <span class="dt">u8</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ENABLED_OFFSET<span class="op">:</span> <span class="dt">u8</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> INTERRUPT_MASK<span class="op">:</span> <span class="dt">u8</span> <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> INTERRUPT_OFFSET<span class="op">:</span> <span class="dt">u8</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> KIND_MASK<span class="op">:</span> <span class="dt">u8</span> <span class="op">=</span> <span class="dv">7</span> <span class="op">&lt;&lt;</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> KIND_OFFSET<span class="op">:</span> <span class="dt">u8</span> <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span></code></pre></div>
+<p>Next, we’ll declare a field type and do our operations to convert a
+given value into its position-relevant value for use inside the
+register.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Field <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    value<span class="op">:</span> <span class="dt">u8</span><span class="op">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span> Field <span class="op">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> new(mask<span class="op">:</span> <span class="dt">u8</span><span class="op">,</span> offset<span class="op">:</span> <span class="dt">u8</span><span class="op">,</span> val<span class="op">:</span> <span class="dt">u8</span>) <span class="op">-&gt;</span> <span class="dt">Self</span> <span class="op">{</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        Field <span class="op">{</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            value<span class="op">:</span> (val <span class="op">&lt;&lt;</span> offset) <span class="op">&amp;</span> mask<span class="op">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Finally, a <code>Register</code> type, which wraps around the numeric type that
+matches the width of our register. <code>Register</code> has an update function
+which updates the register with the given field.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Register(<span class="dt">u8</span>)<span class="op">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span> Register <span class="op">{</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> update(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">,</span> val<span class="op">:</span> Field) <span class="op">{</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">self</span><span class="op">.</span><span class="dv">0</span> <span class="op">=</span> <span class="kw">self</span><span class="op">.</span><span class="dv">0</span> <span class="op">|</span> field<span class="op">.</span>value<span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> enable_register(<span class="op">&amp;</span><span class="kw">mut</span> reg) <span class="op">{</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    reg<span class="op">.</span>update(<span class="pp">Field::</span>new(ENABLED_MASK<span class="op">,</span> ENABLED_OFFSET<span class="op">,</span> <span class="dv">1</span>))<span class="op">;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This is nice, but it’s not ideal. We have to remember to bring the
+mask and offset with us, and we’re calculating them ad hoc, by hand,
+which could be problematic. We humans aren’t great at precise and
+repetitive tasks—we tend to get tired or lose focus and this leads to
+mistakes. Transcribing by hand the masks and offsets one register at a
+time will almost certainly end badly. This is the kind of task we
+ought to leave to a machine.</p>
+<p>Secondarily, what if there was a way to have the field’s type itself
+carry the mask and offset information? What if we could catch mistakes
+in our implementation for how we access and interact with hardware
+registers at compile-time instead of discovering them at runtime?
+Perhaps we can lean on one of the strategies commonly used to suss out
+issues at compile-time, like types.</p>
+<h2 id="leveling-up">Leveling Up</h2>
+<p>Let’s modify our earlier example by using
+<a href="https://docs.rs/crate/typenum">typenum</a>, a library that provides
+numbers and arithmetic at the type level. Here we’ll parameterize our
+<code>Field</code> type with its mask and offset, making it available for any
+instance of <code>Field</code> without needing to include it at the callsite.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>macro_use<span class="at">]</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">extern</span> <span class="kw">crate</span> typenum<span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">use</span> <span class="pp">core::marker::</span>PhantomData<span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">use</span> <span class="pp">typenum::</span><span class="op">*;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Now we’ll add Mask and Offset to Field’s type</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Field<span class="op">&lt;</span>Mask<span class="op">:</span> Unsigned<span class="op">,</span> Offset<span class="op">:</span> Unsigned<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    value<span class="op">:</span> <span class="dt">u8</span><span class="op">,</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    _mask<span class="op">:</span> PhantomData<span class="op">&lt;</span>Mask<span class="op">&gt;,</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    _offset<span class="op">:</span> PhantomData<span class="op">&lt;</span>Offset<span class="op">&gt;,</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">// We can use type aliases to give meaningful names to</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">// our fields (and not have to remember their offsets masks).</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegEnabled <span class="op">=</span> Field<span class="op">&lt;</span>U1<span class="op">,</span> U0<span class="op">&gt;;</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegInterrupt <span class="op">=</span> Field<span class="op">&lt;</span>U2<span class="op">,</span> U1<span class="op">&gt;;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegKind <span class="op">=</span> Field<span class="op">&lt;</span><span class="pp">op!</span>(U7 <span class="op">&lt;&lt;</span> U2)<span class="op">,</span> U2<span class="op">&gt;;</span></span></code></pre></div>
+<p>And now, when revisiting <code>Field</code>’s constructor, we can elide the mask
+and offset parameters, as the type itself contains that information:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span><span class="op">&lt;</span>Mask<span class="op">:</span> Unsigned<span class="op">,</span> Offset<span class="op">:</span> Unsigned<span class="op">&gt;</span> Field<span class="op">&lt;</span>Mask<span class="op">,</span> Offset<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> new(val<span class="op">:</span> <span class="dt">u8</span>) <span class="op">-&gt;</span> <span class="dt">Self</span> <span class="op">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        Field <span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>            value<span class="op">:</span> (val <span class="op">&lt;&lt;</span> <span class="pp">Offset::</span>U8) <span class="op">&amp;</span> <span class="pp">Mask::</span>U8<span class="op">,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>            _mask<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            _offset<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">// And to enable our register...</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> enable_register(<span class="op">&amp;</span><span class="kw">mut</span> reg) <span class="op">{</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    reg<span class="op">.</span>update(<span class="pp">RegEnabled::</span>new(<span class="dv">1</span>))<span class="op">;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This is looking pretty good, but… what happens when we make a mistake
+regarding whether a given value will fit into a field? Consider a
+simple typo where we put <code>10</code> instead of <code>1</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> enable_register(<span class="op">&amp;</span><span class="kw">mut</span> reg) <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    reg<span class="op">.</span>update(<span class="pp">RegEnabled::</span>new(<span class="dv">10</span>))<span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>In our code above? What is the expected outcome? Well, the code we
+have now will set that enabled bit to 0 because <code>10 &amp; 1 = 0</code>. That’s
+unfortunate; it would be nice to know that a value I’m attempting to
+write into a field will actually fit into that field before attempting
+a write. As a matter of fact, I’d consider lopping off the high bits
+of an errant field value <em>undefined behavior</em> (*gasps*).</p>
+<h2 id="safety-first">Safety First</h2>
+<p>How can we check that a field’s value fits in its prescribed position
+in a general way? More type-level numbers!</p>
+<p>We can add a <code>Width</code> parameter to <code>Field</code>, and use it to verify that
+we can fit the given value into the field.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Field<span class="op">&lt;</span>Width<span class="op">:</span> Unsigned<span class="op">,</span> Mask<span class="op">:</span> Unsigned<span class="op">,</span> Offset<span class="op">:</span> Unsigned<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    value<span class="op">:</span> <span class="dt">u8</span><span class="op">,</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    _mask<span class="op">:</span> PhantomData<span class="op">&lt;</span>Mask<span class="op">&gt;,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    _offset<span class="op">:</span> PhantomData<span class="op">&lt;</span>Offset<span class="op">&gt;,</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    _width<span class="op">:</span> PhantomData<span class="op">&lt;</span>Width<span class="op">&gt;,</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegEnabled <span class="op">=</span> Field<span class="op">&lt;</span>U1<span class="op">,</span>U1<span class="op">,</span> U0<span class="op">&gt;;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegInterrupt <span class="op">=</span> Field<span class="op">&lt;</span>U1<span class="op">,</span> U2<span class="op">,</span> U1<span class="op">&gt;;</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegKind <span class="op">=</span> Field<span class="op">&lt;</span>U3<span class="op">,</span> <span class="pp">op!</span>(U7 <span class="op">&lt;&lt;</span> U2)<span class="op">,</span> U2<span class="op">&gt;;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span><span class="op">&lt;</span>Width<span class="op">:</span> Unsigned<span class="op">,</span> Mask<span class="op">:</span> Unsigned<span class="op">,</span> Offset<span class="op">:</span> Unsigned<span class="op">&gt;</span> Field<span class="op">&lt;</span>Width<span class="op">,</span> Mask<span class="op">,</span> Offset<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> new(val<span class="op">:</span> <span class="dt">u8</span>) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">Self</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> val <span class="op">&lt;=</span> (<span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="pp">Width::</span>U8) <span class="op">-</span> <span class="dv">1</span> <span class="op">{</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            <span class="cn">Some</span>(Field <span class="op">{</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>                value<span class="op">:</span> (val <span class="op">&lt;&lt;</span> <span class="pp">Offset::</span>U8) <span class="op">&amp;</span> <span class="pp">Mask::</span>U8<span class="op">,</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>                _mask<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>                _offset<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>                _width<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>            <span class="cn">None</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Now we can only construct a <code>Field</code> if the given value fits! Otherwise,
+we have <code>None</code>, which would signal to us that an error has occurred,
+rather than lop off the high bits of the value and silently write an
+unexpected value.</p>
+<p>Note, though, this will raise an error at runtime. However, we knew
+the value we wanted to write beforehand, remember? Let’s use that fact
+to raise the assurance bar. We can teach the compiler to reject
+entirely a program which has an invalid field value—we don’t have to
+wait until we run it!</p>
+<p>This time we’ll add a trait bound (the <code>where</code> clause) to a new
+realization of new, called <code>new_checked</code> that asks that the incoming
+value be less-than-or-equal-to the maximum possible value a field with
+the given <code>Width</code> can hold.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Field<span class="op">&lt;</span>Width<span class="op">:</span> Unsigned<span class="op">,</span> Mask<span class="op">:</span> Unsigned<span class="op">,</span> Offset<span class="op">:</span> Unsigned<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    value<span class="op">:</span> <span class="dt">u8</span><span class="op">,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    _mask<span class="op">:</span> PhantomData<span class="op">&lt;</span>Mask<span class="op">&gt;,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    _offset<span class="op">:</span> PhantomData<span class="op">&lt;</span>Offset<span class="op">&gt;,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    _width<span class="op">:</span> PhantomData<span class="op">&lt;</span>Width<span class="op">&gt;,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegEnabled <span class="op">=</span> Field<span class="op">&lt;</span>U1<span class="op">,</span> U1<span class="op">,</span> U0<span class="op">&gt;;</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegInterrupt <span class="op">=</span> Field<span class="op">&lt;</span>U1<span class="op">,</span> U2<span class="op">,</span> U1<span class="op">&gt;;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> RegKind <span class="op">=</span> Field<span class="op">&lt;</span>U3<span class="op">,</span> <span class="pp">op!</span>(U7 <span class="op">&lt;&lt;</span> U2)<span class="op">,</span> U2<span class="op">&gt;;</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span><span class="op">&lt;</span>Width<span class="op">:</span> Unsigned<span class="op">,</span> Mask<span class="op">:</span> Unsigned<span class="op">,</span> Offset<span class="op">:</span> Unsigned<span class="op">&gt;</span> Field<span class="op">&lt;</span>Width<span class="op">,</span> Mask<span class="op">,</span> Offset<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> <span class="kw">fn</span> new_checked<span class="op">&lt;</span>V<span class="op">:</span> Unsigned<span class="op">&gt;</span>() <span class="op">-&gt;</span> <span class="dt">Self</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>        V<span class="op">:</span> IsLessOrEqual<span class="op">&lt;</span><span class="pp">op!</span>((U1 <span class="op">&lt;&lt;</span> Width) <span class="op">-</span> U1)<span class="op">,</span> Output <span class="op">=</span> True<span class="op">&gt;,</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        Field <span class="op">{</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            value<span class="op">:</span> (<span class="pp">V::</span>U8 <span class="op">&lt;&lt;</span> <span class="pp">Offset::</span>U8) <span class="op">&amp;</span> <span class="pp">Mask::</span>U8<span class="op">,</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>            _mask<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>            _offset<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>            _width<span class="op">:</span> PhantomData<span class="op">,</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Only numbers which for which this property holds have an
+implementation of this trait, so if we give a number which does not
+fit, it’ll fail to compile. Take a look!</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> enable_register(<span class="op">&amp;</span><span class="kw">mut</span> reg) <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    reg<span class="op">.</span>update(<span class="pp">RegEnabled::new_checked::</span><span class="op">&lt;</span>U10<span class="op">&gt;</span>())<span class="op">;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre><code>12 |     reg.update(RegEnabled::new_checked::&lt;U10&gt;());
+   |                           ^^^^^^^^^^^^^^^^ expected struct `typenum::B0`, found struct `typenum::B1`
+   |
+   = note: expected type `typenum::B0`
+           found type `typenum::B1`</code></pre>
+<p>Now we’ve really done it. <code>new_checked</code> will result in the failure to
+produce a program which has an errant too-high value for a field. So
+our typo from before won’t blow up at runtime, as we would never have
+gotten an artifact to run. Now we’re nearing the Peak Rust Vicinity
+with regard to how safe we can make memory-mapped hardware
+interactions.</p>
+<p>However, what we wrote down way back in the first example in C was far
+more succinct than the type parameter salad we ended up with. Is doing
+such a thing even tractable when you’re talking about potentially
+hundreds or even thousands of registers?</p>
+<h2 id="safe-and-accessible">Safe and Accessible</h2>
+<p>Earlier I called out calculating our masks by hand as being
+problematic, but then all I really did was the same problematic
+thing—albeit at the type-level. While the use of such an approach is
+nice, getting to the point that we can actually write any code
+requires quite a bit of boilerplate and manual transcription (I’m
+talking about the type synonyms here).</p>
+<p>We wanted something like the <a href="https://docs.rs/tock-registers/0.3.0/tock_registers/">TockOS mmio
+registers</a>, but
+one that would generate our typesafe implementations with the least
+amount of manual transcription possible. What came out of this was a
+macro which generates the necessary boilerplate to get a Tock-like API
+plus our type-based bounds checking. To use it, you write down some
+information about a register, its fields, their width and offsets, and
+optional enum-like values should you want to give “meaning” to the
+possible values a field can have.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="pp">register!</span> <span class="op">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The register&#39;s name</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    Status<span class="op">,</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The type which represents the whole register.</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">u8</span><span class="op">,</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The register&#39;s mode, ReadOnly, ReadWrite, or WriteOnly.</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    RW<span class="op">,</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// And the fields in this register.</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    Fields [</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        On    WIDTH(U1) OFFSET(U0)<span class="op">,</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        Dead  WIDTH(U1) OFFSET(U1)<span class="op">,</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        Color WIDTH(U3) OFFSET(U2) [</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>            Red    <span class="op">=</span> U1<span class="op">,</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>            Blue   <span class="op">=</span> U2<span class="op">,</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            Green  <span class="op">=</span> U3<span class="op">,</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>            Yellow <span class="op">=</span> U4</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>From this, we generate register and field types like the final example
+above where the indices—the <code>Width</code>, <code>Mask</code>, and <code>Offset</code>—are derived
+from the values input in the <code>WIDTH</code> and <code>OFFSET</code> sections of a
+field’s definitions. Also, notice that the numbers here are all
+<code>typenums</code>; they’re going to go directly into our <code>Field</code> definitions!</p>
+<p>The generated code namespaces registers and their fields through the
+name given for the register and the fields, something like this:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">mod</span> Status <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> Register(<span class="dt">u8</span>)<span class="op">;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">mod</span> On <span class="op">{</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> Field<span class="op">;</span> <span class="co">// There is of course more to this definition</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">mod</span> Dead <span class="op">{</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> Field<span class="op">;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">mod</span> Color <span class="op">{</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">struct</span> Field<span class="op">;</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">pub</span> <span class="kw">const</span> Red<span class="op">:</span> Field <span class="op">=</span> <span class="pp">Field::</span><span class="op">&lt;</span>U1<span class="op">&gt;</span>new()<span class="op">;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">// &amp;c.</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The generated API contains the nominally expected read and write
+primitives to get at the raw register value, but it also has ways to
+get a single field’s value, do collective actions, and find out if any
+or all of a collection of bits are set. You can read the documentation
+on the <a href="https://github.com/auxoncorp/bounded-registers#the-register-api">complete generated API
+here</a>.</p>
+<h2 id="kicking-the-tires">Kicking the Tires</h2>
+<p>So what does it look like to actually use these definitions for a real
+device? Is code going to be littered with type parameters, obscuring
+any real logic from view?</p>
+<p>No! By using type synonyms and type inference, we effectively never
+have to think about the type-level part of the program at all. We get
+to interact with the hardware in a straightforward way and get those
+bounds-related assurances automatically.</p>
+<p>Here’s an example of a UART register block. We’ll skip the declaration
+of the registers themselves, as that would be too much to include
+here. Instead, we’ll start with a register “block” then help the
+compiler know how to look these registers up from a pointer to the
+head of the block. We do that by implementing <code>Deref</code> and <code>DerefMut</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>repr<span class="at">(</span>C<span class="at">)]</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> UartBlock <span class="op">{</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    rx<span class="op">:</span> <span class="pp">UartRX::</span>Register<span class="op">,</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    _padding1<span class="op">:</span> [<span class="dt">u32</span><span class="op">;</span> <span class="dv">15</span>]<span class="op">,</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    tx<span class="op">:</span> <span class="pp">UartTX::</span>Register<span class="op">,</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    _padding2<span class="op">:</span> [<span class="dt">u32</span><span class="op">;</span> <span class="dv">15</span>]<span class="op">,</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    control1<span class="op">:</span> <span class="pp">UartControl1::</span>Register<span class="op">,</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> Regs <span class="op">{</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    addr<span class="op">:</span> <span class="dt">usize</span><span class="op">,</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span> <span class="bu">Deref</span> <span class="cf">for</span> Regs <span class="op">{</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">type</span> Target <span class="op">=</span> UartBlock<span class="op">;</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> deref(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span>UartBlock <span class="op">{</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>        <span class="kw">unsafe</span> <span class="op">{</span> <span class="op">&amp;*</span>(<span class="kw">self</span><span class="op">.</span>addr <span class="kw">as</span> <span class="op">*</span><span class="kw">const</span> UartBlock) <span class="op">}</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span> <span class="bu">DerefMut</span> <span class="cf">for</span> Regs <span class="op">{</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">fn</span> deref_mut(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="kw">mut</span> UartBlock <span class="op">{</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>        <span class="kw">unsafe</span> <span class="op">{</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="op">*</span>(<span class="kw">self</span><span class="op">.</span>addr <span class="kw">as</span> <span class="op">*</span><span class="kw">mut</span> UartBlock) <span class="op">}</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Once this is in place, you’ll find that the use of these registers is
+as simple as <code>read()</code> and <code>modify()</code>.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// A pretend register block.</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> x <span class="op">=</span> [<span class="dv">0_u32</span><span class="op">;</span> <span class="dv">33</span>]<span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> regs <span class="op">=</span> Regs <span class="op">{</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Some shenanigans to get at `x` as though it were a</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">// pointer. Normally you&#39;d be given some address like</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">// `0xDEADBEEF` over which you&#39;d instantiate a `Regs`.</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        addr<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> x <span class="kw">as</span> <span class="op">*</span><span class="kw">mut</span> [<span class="dt">u32</span><span class="op">;</span> <span class="dv">33</span>] <span class="kw">as</span> <span class="dt">usize</span><span class="op">,</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="pp">assert_eq!</span>(regs<span class="op">.</span>rx<span class="op">.</span>read()<span class="op">,</span> <span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    regs<span class="op">.</span>control1</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>modify(<span class="pp">UartControl1::Enable::</span>Set <span class="op">+</span> <span class="pp">UartControl1::RecvReadyInterrupt::</span>Set)<span class="op">;</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// The first bit and the 10th bit should be set.</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="pp">assert_eq!</span>(regs<span class="op">.</span>control1<span class="op">.</span>read()<span class="op">,</span> <span class="dv">0b_10_0000_0001</span>)<span class="op">;</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>For fields whose values we don’t know ahead of time, we can build
+one<span class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span class="sidenote"><code>get_field</code> looks a little weird. I’m looking at the <code>Field::Read</code>
+part, specifically. <code>Field</code> is a type, and we need an instance of that
+type to pass to <code>get_field</code>. A cleaner API maybe something like:<br />
+<br />
+But remember that Field is a type synonym which has fixed indices for
+width, offset, &amp;c. To be able to parameterize get_field like this,
+we’d need higher-kinded types!<br />
+<br />
+</span></span>. I’m using unwrap here, but in a real program with unknown inputs,
+you’d probably want to check that you got a <code>Some</code> back from that new
+call<span class="sidenote-wrapper"><label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"/><span class="sidenote">Technically, a read from a register field is by definition
+only going to give you a value within the prescribed bounds, but
+we don’t live in a pure world and you never know what’s going to
+happen when external systems come into play. We’re at the behest
+of the Hardware Gods here, so instead of forcing you into a “might
+panic” situation, we give you back the <code>Option</code> to handle a This
+Should Never Happen case.<br />
+<br />
+</span></span>.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// A pretend register block.</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> x <span class="op">=</span> [<span class="dv">0_u32</span><span class="op">;</span> <span class="dv">33</span>]<span class="op">;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> regs <span class="op">=</span> Regs <span class="op">{</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Some shenanigans to get at `x` as though it were a</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">// pointer. Normally you&#39;d be given some address like</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">// `0xDEADBEEF` over which you&#39;d instantiate a `Regs`.</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        addr<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> x <span class="kw">as</span> <span class="op">*</span><span class="kw">mut</span> [<span class="dt">u32</span><span class="op">;</span> <span class="dv">33</span>] <span class="kw">as</span> <span class="dt">usize</span><span class="op">,</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">};</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> input <span class="op">=</span> regs<span class="op">.</span>rx<span class="op">.</span>get_field(<span class="pp">UartRX::Data::Field::</span><span class="bu">Read</span>)<span class="op">.</span>unwrap()<span class="op">;</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    regs<span class="op">.</span>tx<span class="op">.</span>modify(<span class="pp">UartTX::Data::Field::</span>new(input)<span class="op">.</span>unwrap())<span class="op">;</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="decoding-failure">Decoding Failure</h2>
+<p>Depending on your personal pain threshold you may have noticed that
+the errors are nearly unintelligible. Let’s look at a not-so-subtle
+reminder of what I’m talking about:</p>
+<pre><code>error[E0271]: type mismatch resolving `&lt;typenum::UInt&lt;typenum::UInt&lt;typenum::UInt&lt;typenum::UInt&lt;typenum::UInt&lt;typenum::UTerm, typenum::B1&gt;, typenum::B0&gt;, typenum::B1&gt;, typenum::B0&gt;, typenum::B0&gt; as typenum::IsLessOrEqual&lt;typenum::UInt&lt;typenum::UInt&lt;typenum::UInt&lt;typenum::UInt&lt;typenum::UTerm, typenum::B1&gt;, typenum::B0&gt;, typenum::B1&gt;, typenum::B0&gt;&gt;&gt;::Output == typenum::B1`
+  --&gt; src/main.rs:12:5
+   |
+12 |     less_than_ten::&lt;U20&gt;();
+   |     ^^^^^^^^^^^^^^^^^^^^ expected struct `typenum::B0`, found struct `typenum::B1`
+   |
+   = note: expected type `typenum::B0`
+       found type `typenum::B1`</code></pre>
+<p>The expected <code>typenum::B0</code> found <code>typenum::B1</code> part kind of makes
+sense, but what on Earth is the <code>typenum::UInt&lt;typenum::UInt, typenum::UInt</code>… nonsense? Well, <code>typenum</code> represents numbers as
+binary cons cells! Errors like this make it hard, especially when you
+have several of these type-level numbers confined to tight quarters,
+to know which number it’s even talking about. Unless, of course, it’s
+second nature for you to translate baroque binary representations to
+decimal ones.</p>
+<p>After the <code>U100th</code> time attempting to decipher any meaning from this
+mess, a teammate got Mad As Hell And Wasn’t Going To Take It Anymore
+and made a little utility,
+<a href="https://github.com/auxoncorp/tnfilt"><code>tnfilt</code></a>, to parse the meaning
+out from the misery that is namespaced binary cons cells. <code>tnfilt</code>
+takes the cons cell-style notation and replaces it with sensible
+decimal numbers. So, along with bounded-registers we’d like to also
+share <code>tnfilt</code>. You use it like this:</p>
+<pre><code>$ cargo build 2&gt;&amp;1 | tnfilt</code></pre>
+<p>It transforms the output above into something like this:</p>
+<pre><code>error[E0271]: type mismatch resolving `&lt;U20 as typenum::IsLessOrEqual&lt;U10&gt;&gt;::Output == typenum::B1`</code></pre>
+<p>Now that makes sense!</p>
+<h2 id="in-conclusion">In Conclusion</h2>
+<p>Memory-mapped registers are used ubiquitously when interacting with
+hardware from our software, and there are myriad ways in which to
+portray those interactions, each of which has a different place on the
+spectra of ease-of-use and safety. With <code>bounded-registers</code>, we
+started by locking ourselves in place right at the edge of the
+more-safe side of that safety spectrum and then tried to figure out
+how to move the ease-of-use slider closer to the easy end. From those
+ambitions <code>bounded-registers</code> was born, and I hope you’ll keep it in
+mind any time you encounter memory-mapped devices in you adventures.</p>
+<hr />
+<p>A version of this post exists at:
+<a href="https://blog.auxon.io/2019/10/25/type-level-registers/">blog.auxon.io</a></p>
+<p>I copied it here with minor edits, mainly because I didn’t want it to
+get lost.</p>
+	 </section>
+       </article>
+
+     </div>
+
+     <div id="footer">
+       © dan pittman.<br>
+       I reserve the right to be wrong.
+     </div>
+
+  </body>
+
+</html>
+
