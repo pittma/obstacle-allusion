@@ -38,6 +38,17 @@ blockquote p {
     font-style: italic;
 }
 
+.poem {
+    width: 55%;
+    padding: 5px;
+    border-left: var(--accent-color) 5px solid;
+    background-color: var(--base-color);
+    color: var(--bg-color);
+    font-family: 'Spectral', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+}
+
 #footer {
     font-size: 0.75em;
 }
