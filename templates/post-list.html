@@ -2,7 +2,11 @@
   $for(items)$
   $if(publish)$
   <li>
+    $if(subtitle)$
+    $date$: <a href="/$blog-route$">$title$</a>: $subtitle$
+    $else$
     $date$: <a href="/$blog-route$">$title$</a>
+    $endif$
   </li>
   $endif$
   $endfor$

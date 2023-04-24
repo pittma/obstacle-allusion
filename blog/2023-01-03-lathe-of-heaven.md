@@ -1,5 +1,6 @@
 ---
 title: "The Lathe of Heaven"
+subtitle: A cautionary tale about infinite possibility.
 publish: true
 track: true
 tags: book, review
