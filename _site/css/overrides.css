@@ -1,6 +1,7 @@
 :root {
     --bg-color: rgb(20, 41, 64);
-    --base-color: rgb(231, 234, 236);
+    --base-color: rgb(195, 217, 232);
+    --title-color: rgb(231, 234, 236);
     --accent-color: rgb(174, 114, 48);
 }
 
@@ -8,6 +9,15 @@ body {
     font-family: 'Spectral', serif;
     color: var(--base-color);
     background-color: var(--bg-color);
+}
+
+h1, h2, h3, h4, h5 {
+    color: var(--title-color);
+}
+
+.list-st {
+    color: var(--title-color);
+    font-style: italic;
 }
 
 h1 {
