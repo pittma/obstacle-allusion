@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    
+    
+    <title>Obstacle Allusion :: Understanding Fibrations</title>
+    
+    
+    <meta name="viewport" content="width=device-width">
+
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/solarized.css">
+    <link rel="stylesheet" href="/tufte/tufte.css">
+    <link rel="stylesheet" href="/css/overrides.css">
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+    "HTML-CSS": {
+    styles: {".MathJax_Preview": {visibility: "hidden"}}
+    },
+    tex2jax: {inlineMath: [["\[","\]"],["\\\(","\\\)"]]},
+    TeX: {extensions: ["AMSmath.js","AMSsymbols.js","/js/xypic.js"]}
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js"></script>
+  
+
+  
+
+  </head>
+  <body>
+
+    <div id="header">
+       <div id="navigation">
+         <b><a href="/">home</a></b>
+	 //
+         <b><a href="/about">about</a></b>
+	 //
+         <b><a href="/archive">archive</a></b>
+       </div>
+    </div>
+
+
+     <div id="content">
+
+       <h1>Understanding Fibrations</h1>
+       
+       <div class="subtitle">Come with me on a journey where ChatGPT tries to lead me off a mathematical cliff.</div>
+       
+
+       
+       05-24-2023
+       
+       
+       |
+       <a title="All pages tagged &#39;math&#39;." href="/tags/math/index.html">math</a>, <a title="All pages tagged &#39;category theory&#39;." href="/tags/category%20theory/index.html">category theory</a>
+       
+	 
+       <article>
+	 <section>
+           <p>I started reading Bart Jacob’s <em>Categorical Logic and Type Theory</em>
+book today after seeing it mentioned on the Category Theory Zulip
+because I’ve been seriously itching to get back into some mathy /
+formalish stuff—life in hardware/software land just hasn’t been
+cutting it. I have heard a dozen times, I once even tried to slog
+through the CwF paper, about the categorical semantics for type theory
+being presheaf based as the presheaf apparently captures the notion of
+type families. However, after reading through Chapter 0: Prospectus in
+Jacobs’ book, it sounds like he’s going to use fibrations to talk
+about indexing rather than presheafs, so I wanted to update my
+understanding, precisely, on what a fibration actually was. After
+having moderate success recently in asking it for help to remember how
+to do <code>Either</code>-based error <em>returning</em> rather than exception
+<em>throwing</em> in Haskell, I thought I’d chat with ChatGPT viz-a-viz
+categorical fibrations. Here’s the first thing it told me, which makes
+sense:</p>
+<div class="multiline-quote">
+<p>[A] functor <span class="math inline">\(F: C \to D\)</span> between categories is called a fibration if
+for every morphism <span class="math inline">\(f: X \to Y\)</span> in the codomain category D and for
+every object <span class="math inline">\(X\)</span> in the domain category <span class="math inline">\(C\)</span>, there exists:</p>
+<ol type="1">
+<li>An object <span class="math inline">\(\text{fib}(f)\)</span> in <span class="math inline">\(C\)</span>, called the “fiber” or “preimage”
+of <span class="math inline">\(f\)</span> under <span class="math inline">\(F\)</span>, and</li>
+<li>A morphism <span class="math inline">\(p(f): \text{fib}(f) \to X\)</span> in <span class="math inline">\(C\)</span>, called the
+“lifting” or “pullback” of <span class="math inline">\(f\)</span> along <span class="math inline">\(F\)</span>, such that <span class="math inline">\(F(p(f)) = f\)</span>.</li>
+</ol>
+</div>
+<p>Ok GPT, I’m with you so far. So next I asked it if it could give me a
+diagram. “Certainly!” it replied, followed with an example using the
+category <span class="math inline">\(C\)</span>, a category with two objects <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>, and <em><em>only</em></em>
+identity morphisms, and a functor <span class="math inline">\(F : C \to D\)</span> where <span class="math inline">\(D\)</span> was the
+category given by <span class="math inline">\(\langle\mathbb{N},\ \le\rangle\)</span>. It then gave an
+example of a <span class="math inline">\(p\)</span> that depended on a morphism in <span class="math inline">\(C\)</span> from <span class="math inline">\(0\)</span> to
+<span class="math inline">\(1\)</span>. Which, in its own example did not exist.</p>
+<p>I corrected it, telling that there was no morphism <span class="math inline">\(f : 0 \to 1\)</span> in
+<span class="math inline">\(C\)</span>, so it gave me another example with <span class="math inline">\(C\)</span> being the two object
+category with <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> and again only identity morphisms, and <span class="math inline">\(D\)</span>
+being <span class="math inline">\(\textbf{Set}\)</span>. And then proceeded to, three different times,
+give me examples where the lifting morphism depended on a morphism <span class="math inline">\(A \to B\)</span> in <span class="math inline">\(C\)</span>.</p>
+<p>Finally, it gave me an example that makes sense after I told it,
+“That’s the same example! You’re still saying that id_A is A -&gt; B, but
+this is only the case if A and B are isomorphic, leaving C to be a
+category with one object rather than two.”</p>
+<p>This time it told me that <span class="math inline">\(f\)</span> was <span class="math inline">\(\text{Id}_X\)</span> then <span class="math inline">\(p(f)\)</span> was
+<span class="math inline">\(\text{Id}_a\)</span>, but if <span class="math inline">\(f = \text{I}_Y\)</span>, then there was no morphism
+that lifts <span class="math inline">\(f\)</span> in <span class="math inline">\(C\)</span>. Finally I asked it if the lifting <span class="math inline">\(p\)</span> could be</p>
+<p><span class="math display">\[
+p(f) = \left\{\begin{array}{lr}
+  f = \text{Id}_X &amp; \text{Id}_A \\
+  f = \text{Id}_Y &amp; \text{Id}_B
+  \end{array}\right\}
+\]</span></p>
+<p>To which it said, ah, yes, that should work too:</p>
+<blockquote>
+<p>Apologies for the confusion caused by my previous incorrect
+statement. You are correct. In the given example, if f is the
+identity morphism on Y (f = id_Y), then the fiber fib(f) is the
+object B in C, and the lifting p(f) is the identity morphism id_B: B
+-&gt; B.</p>
+</blockquote>
+<p>Concluding with:</p>
+<div class="multiline-quote">
+<p>The fiber <span class="math inline">\(\text{fib}(f)\)</span> for <span class="math inline">\(f\)</span> in <span class="math inline">\(C\)</span> is defined as follows:</p>
+<ul>
+<li>If <span class="math inline">\(f\)</span> is the identity morphism on <span class="math inline">\(X\ (f\ =\ id_X)\)</span>, then the fiber <span class="math inline">\(\text{fib}(f)\)</span>
+is the object <span class="math inline">\(A\)</span> in <span class="math inline">\(C\)</span>.</li>
+<li>If <span class="math inline">\(f\)</span> is the identity morphism on <span class="math inline">\(Y\ (f\ =\ id_Y)\)</span>, then the fiber <span class="math inline">\(\text{fib}(f)\)</span>
+is the object <span class="math inline">\(B\)</span> in <span class="math inline">\(C\)</span>.</li>
+</ul>
+<p>To define the lifting <span class="math inline">\(p(f)\)</span> for <span class="math inline">\(f: X \to Y\)</span>:</p>
+<ul>
+<li>If <span class="math inline">\(f\)</span> is the identity morphism on <span class="math inline">\(X (f = id_X)\)</span>, then the lifting
+<span class="math inline">\(p(f)\)</span> is the identity morphism <span class="math inline">\(id_A: A \to A\)</span> in <span class="math inline">\(C\)</span>.</li>
+<li>If <span class="math inline">\(f\)</span> is the identity morphism on <span class="math inline">\(Y (f = id_Y)\)</span>, then the lifting
+<span class="math inline">\(p(f)\)</span> is the identity morphism <span class="math inline">\(id_B: B \to B\)</span> in <span class="math inline">\(C\)</span>.</li>
+</ul>
+</div>
+<p>So if you’re following along this far you may have noticed that,
+because of ChatGPT’s bad examples, I missed an important detail: <span class="math inline">\(f\)</span>
+is supposed to be <span class="math inline">\(X \to Y\)</span> in <span class="math inline">\(D\)</span>—it can’t be identities in <span class="math inline">\(D\)</span>! The
+only way this works is if in <span class="math inline">\(F\)</span>’s domain category, there is at least
+one morphism between <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span>. Here’s the last example that we
+arrived at together:</p>
+<div class="multiline-quote">
+<p>Consider the category <span class="math inline">\(C = \{A, B\}\)</span> with two objects <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> and
+two non-identity morphisms <span class="math inline">\(f: A \to B\)</span> and <span class="math inline">\(g: A \to B\)</span>. Let <span class="math inline">\(D\)</span> be
+the category of sets.</p>
+<p>Define a functor <span class="math inline">\(F: C \to D\)</span> as follows:</p>
+<ul>
+<li><span class="math inline">\(F(A) = X\)</span>, where <span class="math inline">\(X\)</span> is a set,</li>
+<li><span class="math inline">\(F(B) = Y\)</span>, where <span class="math inline">\(Y\)</span> is another set,</li>
+<li><span class="math inline">\(F(f) = h: X \to Y\)</span>, a function from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>,</li>
+<li><span class="math inline">\(F(g) = k: X \to Y\)</span>, another function from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>.</li>
+</ul>
+<p>In this case, the functor <span class="math inline">\(F\)</span> maps objects <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> in <span class="math inline">\(C\)</span> to sets
+<span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> in <span class="math inline">\(D\)</span>, respectively, and it maps the non-identity
+morphisms <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> in <span class="math inline">\(C\)</span> to the functions <span class="math inline">\(h\)</span> and <span class="math inline">\(k\)</span> in <span class="math inline">\(D\)</span>.</p>
+<p>To show that <span class="math inline">\(F\)</span> is a fibration, let’s consider a morphism <span class="math inline">\(f: X \to Y\)</span> in <span class="math inline">\(D\)</span>.</p>
+<p>The fiber <span class="math inline">\(\text{fib}(f)\)</span> for <span class="math inline">\(f\)</span> in <span class="math inline">\(C\)</span> is defined as the object <span class="math inline">\(A\)</span>
+in <span class="math inline">\(C\)</span>.</p>
+<p>To define the lifting <span class="math inline">\(p(f)\)</span> for <span class="math inline">\(f: X \to Y\)</span>:</p>
+<ul>
+<li>If <span class="math inline">\(f\)</span> is the function <span class="math inline">\(h: X \to Y\)</span>, the lifting <span class="math inline">\(p(f)\)</span> is the
+morphism <span class="math inline">\(f: A \to B\)</span> in <span class="math inline">\(C\)</span>.</li>
+<li>If <span class="math inline">\(f\)</span> is the function <span class="math inline">\(k: X \to Y\)</span>, the lifting <span class="math inline">\(p(f)\)</span> is the
+morphism <span class="math inline">\(g: A \to B\)</span> in <span class="math inline">\(C\)</span>.</li>
+</ul>
+<p>In both cases, applying <span class="math inline">\(F\)</span> to the lifting <span class="math inline">\(p(f)\)</span> yields the original
+morphism <span class="math inline">\(f: X \to Y\)</span>.</p>
+<p>Therefore, the functor <span class="math inline">\(F: C \to D\)</span> is a fibration since, for every
+morphism <span class="math inline">\(f: X \to Y\)</span> in <span class="math inline">\(D\)</span>, the fiber <span class="math inline">\(\text{fib}(f) = A\)</span> in <span class="math inline">\(C\)</span>,
+and the lifting <span class="math inline">\(p(f)\)</span> satisfies <span class="math inline">\(F(p(f)) = f\)</span>.</p>
+</div>
+<p>Which, as it states, satisfies <span class="math inline">\(F(p(f)) = f\)</span>. I love that everything
+ChatGPT does is in the format that written standardized tests in
+middle school were required to be… “In conclusion, …”</p>
+	 </section>
+       </article>
+
+     </div>
+
+     <div id="footer">
+       © dan pittman.<br>
+       I reserve the right to be wrong.
+     </div>
+
+  </body>
+
+</html>
+

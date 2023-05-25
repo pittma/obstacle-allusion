@@ -1,22 +1,22 @@
 :root {
     --bg-color: rgb(20, 41, 64);
     --base-color: rgb(195, 217, 232);
-    --title-color: rgb(231, 234, 236);
+    --text-color: rgb(231, 234, 236);
     --accent-color: rgb(174, 114, 48);
 }
 
 body {
     font-family: 'Spectral', serif;
-    color: var(--base-color);
+    color: var(--text-color);
     background-color: var(--bg-color);
 }
 
 h1, h2, h3, h4, h5 {
-    color: var(--title-color);
+    color: var(--text-color);
 }
 
 .list-st {
-    color: var(--title-color);
+    color: var(--text-color);
     font-style: italic;
 }
 
@@ -37,26 +37,44 @@ a:link, a:visited {
 
 blockquote {
     margin: 0;
-
 }
 
 blockquote p {
-    padding: 5px;
+    padding-left: 7px;
+    padding-right: 5px;
     border-left: var(--accent-color) 5px solid;
     background-color: var(--base-color);
     color: var(--bg-color);
     font-style: italic;
 }
 
+.subtitle {
+    margin: 0;
+    font-size: 1.3em;
+    color: var(--base-color);
+}
+
 .poem {
     width: 55%;
-    padding: 5px;
+    padding-left: 7px;
+    padding-right: 5px;
     border-left: var(--accent-color) 5px solid;
     background-color: var(--base-color);
     color: var(--bg-color);
     font-family: 'Spectral', serif;
     font-size: 1.4rem;
     font-style: italic;
+}
+
+.multiline-quote {
+    padding-left: 7px;
+    padding-right: 5px;
+    border-left: var(--accent-color) 5px solid;
+    background-color: var(--base-color);
+    color: var(--bg-color);
+    font-style: italic;
+    margin: 0;
+    width: 55%;
 }
 
 #footer {

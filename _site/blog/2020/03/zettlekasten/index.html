@@ -53,6 +53,10 @@
 
        <h1>Using Emacs's org-mode As Your Zettelkasten</h1>
        
+       <div class="subtitle">And some editorializing on the foundations of mathematics...</div>
+       
+
+       
        03-25-2020
        
        
@@ -62,10 +66,6 @@
 	 
        <article>
 	 <section>
-           
-           <h2>And some editorializing on the foundations of mathematics...</h2>
-           
-
            <p>I like to write. I don’t do it as often as I’d like to, but
 nonetheless I do like to do it. I’ve found that one of the best
 exercises for increasing the bandwidth of the passageway from my brain
@@ -194,11 +194,11 @@ things in my zettelkasten—because that’s the whole point!</p>
  <kbd>c </kbd>  <kbd>ctrl </kbd> +
  <kbd>l </kbd> (<code>C-c C-l</code>) then start to type <code>file</code>
 which gives me this menu (I’m using <a href="https://emacs-helm.github.io/helm/">Helm</a>):</p>
-<p><img src="/images/zettel-file.png" /></p>
+<p><img src="file:///images/zettel-file.png" /></p>
 <p>When I hit  <kbd>return</kbd>, it shows my list of
 files in the current directory. That is, the directory of the file I’m
 currently visiting:</p>
-<p><img src="/images/zettel-link.png" /></p>
+<p><img src="file:///images/zettel-link.png" /></p>
 <p>From here I can use the arrow keys or the completion search that Helm
 gives me to find the note I’d like to link. Now I’ve got a link in
 this note:</p>
@@ -231,16 +231,16 @@ amazing things like building a calendar for you, helping you track
 your habits, or organizing your todo list. For us, now, though, we’re
 going to use its tag and string matching searches. It does require a
 little setup in your <code>init.el</code> file to enable it, something like this:</p>
-<div class="sourceCode" id="cb7" data-org-language="emacs-lisp"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(global-set-key (kbd <span class="st">&quot;C-c a&quot;</span>) &#39;org-agenda)</span>
+<div class="sourceCode" id="cb7" data-org-language="emacs-lisp"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(global-set-key (kbd <span class="st">&quot;C-c a&quot;</span>) <span class="dt">&#39;org-agenda</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>(<span class="kw">setq</span> org-agenda-files &#39;(<span class="st">&quot;~/Dropbox/org/notes/todo.org&quot;</span> <span class="st">&quot;~/Dropbox/zet/&quot;</span>))</span></code></pre></div>
 <p>This results in the key sequence  <kbd>ctrl </kbd> +
  <kbd>c </kbd>  <kbd>a </kbd>
 being globally bound to opening Org Agenda, which looks like this:</p>
-<p><img src="/images/zettel-agenda.png" /></p>
+<p><img src="file:///images/zettel-agenda.png" /></p>
 <p>From here I can use  <kbd>m </kbd> to search by tag
 matches, or  <kbd>s </kbd> for string matches, both
 of which yield a list of matches:</p>
-<p><img src="/images/zettel-search.png" /></p>
+<p><img src="file:///images/zettel-search.png" /></p>
 <p>I can just arrow down and select one of the matching headlines to open
 the file containing it.</p>
 <h2 id="valedictions">Valedictions</h2>

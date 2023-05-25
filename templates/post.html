@@ -3,6 +3,10 @@ $partial("templates/header.html")$
      <div id="content">
 
        <h1>$title$</h1>
+       $if(subtitle)$
+       <div class="subtitle">$subtitle$</div>
+       $endif$
+
        $if(date)$
        $date$
        $endif$
@@ -13,10 +17,6 @@ $partial("templates/header.html")$
 	 
        <article>
 	 <section>
-           $if(subtitle)$
-           <h2>$subtitle$</h2>
-           $endif$
-
            $body$
 	 </section>
        </article>

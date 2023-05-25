@@ -53,6 +53,8 @@
 
        <h1>Using Type-Level Programming in Rust to Make Safer Hardware Abstractions</h1>
        
+
+       
        10-25-2019
        
        
@@ -62,8 +64,6 @@
 	 
        <article>
 	 <section>
-           
-
            <p>Introducing
 <a href="https://github.com/auxoncorp/bounded-registers"><code>bounded-registers</code></a>.</p>
 <p>In the world of systems programming where one may find themselves
@@ -98,9 +98,9 @@ replace their occurrences with the code on the right-hand side. This
 is our shorthand for the register we laid out above. The left-hand
 side of the <code>&amp;</code> puts us in position for that field and the right-hand
 side limits us to only that field’s bits.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_ENABLED_FIELD(x) (x &lt;&lt; 0) &amp; 1</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_INTERRUPT_FIELD(x) (x &lt;&lt; 1) &amp; 2</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_KIND_FIELD(x) (x &lt;&lt; 2) &amp; (7 &lt;&lt; 2)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_ENABLED_FIELD</span><span class="op">(</span><span class="pp">x</span><span class="op">)</span><span class="pp"> </span><span class="op">(</span><span class="pp">x </span><span class="op">&lt;&lt;</span><span class="pp"> </span><span class="dv">0</span><span class="op">)</span><span class="pp"> </span><span class="op">&amp;</span><span class="pp"> </span><span class="dv">1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_INTERRUPT_FIELD</span><span class="op">(</span><span class="pp">x</span><span class="op">)</span><span class="pp"> </span><span class="op">(</span><span class="pp">x </span><span class="op">&lt;&lt;</span><span class="pp"> </span><span class="dv">1</span><span class="op">)</span><span class="pp"> </span><span class="op">&amp;</span><span class="pp"> </span><span class="dv">2</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define REG_KIND_FIELD</span><span class="op">(</span><span class="pp">x</span><span class="op">)</span><span class="pp"> </span><span class="op">(</span><span class="pp">x </span><span class="op">&lt;&lt;</span><span class="pp"> </span><span class="dv">2</span><span class="op">)</span><span class="pp"> </span><span class="op">&amp;</span><span class="pp"> </span><span class="op">(</span><span class="dv">7</span><span class="pp"> </span><span class="op">&lt;&lt;</span><span class="pp"> </span><span class="dv">2</span><span class="op">)</span></span></code></pre></div>
 <p>We’d then use these to abstract over the derivation of a register’s
 value with something like:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> set_reg_val<span class="op">(</span>reg<span class="op">*</span> u8<span class="op">,</span> val u8<span class="op">);</span></span>
