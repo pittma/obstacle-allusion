@@ -109,3 +109,9 @@ kbd {
     border-top: var(--accent-color) 3px solid;
     border-bottom: var(--accent-color) 3px solid;
 }
+
+@media (max-width: 760px) {
+    .multiline-quote {
+	width: 100%;
+    }
+}
