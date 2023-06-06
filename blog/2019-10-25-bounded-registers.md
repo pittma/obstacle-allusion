@@ -2,6 +2,7 @@
 title: "Using Type-Level Programming in Rust to Make Safer Hardware Abstractions"
 publish: true
 track: true
+home: true
 tags: programming, rust, formal methods
 ---
 

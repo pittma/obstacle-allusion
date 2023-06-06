@@ -5,6 +5,8 @@ module Main where
 import Hakyll
 import HakyllHacks
 
+import Control.Monad
+import Data.Maybe
 import System.FilePath
 import Text.Pandoc.Options
 import Text.Pandoc.SideNote (usingSideNotes)
@@ -55,7 +57,7 @@ main =
     match "index.html" $ do
       route idRoute
       compile $ do
-        posts <- take 5 <$> (recentFirst =<< loadAll "blog/*")
+        posts <- byHomeKey =<< loadAll "blog/*"
         let context =
               defaultContext <>
               listField
@@ -68,6 +70,18 @@ main =
       route toIdxPath
       compile $ asPostTemp defaultContext
 
+byHomeKey :: (MonadMetadata m, MonadFail m) => [Item a] -> m [Item a]
+byHomeKey list = do
+  homeKeyed <- foldM f [] list
+  recentFirst homeKeyed
+  where
+    f ctx item = do
+      let ident = itemIdentifier item
+      md <- getMetadata ident
+      if isJust $ lookupString "home" md
+        then return $ item : ctx
+        else return ctx
+  
 
 tagsCtx :: Tags -> Context String
 tagsCtx tags = tagsField "tags" tags <> dateCtx <> blogRouteCtx <> defaultContext

@@ -12,9 +12,9 @@ packages:
   original:
     hackage: pandoc-sidenote-0.22.1.0
 - completed:
-    hackage: hakyll-4.15.1.1@sha256:890bff1eb4cf1faca6c9e5eec88a2b78e41b190d6f4781b984c7758fd2ceec75,9962
+    hackage: hakyll-4.15.1.1@sha256:707990cc15bcc9637519dbb3382dfa790f20191a86e988dab2824f5f6bc7ed87,9962
     pantry-tree:
-      sha256: 2fae3bae035f1a74899a1d7ece05dd039f6f8be64167c800cbcd727db1e4ac1d
+      sha256: f61b63725d954d7feea4dc0697771a112c89018c7295c8ee5858f72fcdd384f6
       size: 8861
   original:
     hackage: hakyll-4.15.1.1
