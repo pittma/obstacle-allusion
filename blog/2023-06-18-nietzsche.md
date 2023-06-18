@@ -27,7 +27,7 @@ infinite ball of yarn, with each revolution of the ball getting us
 closer to purpose, to clarity, to zen. If we're left to oscillate
 around the ball, then we never creep nearer its center. The
 implication of Nietzsche's metaphor is a life is one without
-self-reflection, or at least one which out any productive
+self-reflection, or at least one withou:t any productive
 reflection. Productive reflection is the following of the thread,
 tracing what we know now and using it make inferences about the paths
 which lie ahead. If the center is then unattainable, then perhaps
