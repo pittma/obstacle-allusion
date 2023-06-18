@@ -9,6 +9,7 @@ body {
     font-family: 'Spectral', serif;
     color: var(--text-color);
     background-color: var(--bg-color);
+    padding-left: 0;
 }
 
 h1, h2, h3, h4, h5 {
