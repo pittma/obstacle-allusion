@@ -22,17 +22,16 @@ freedom, I realized that this observation was in need of refinement.
 
 Identity is, through life, a convergence on some unattainable
 state. The problem with Nietzsche's take is that an oscillation makes
-no forward progress. Instead, we're unraveling our /raison/ like an
+no forward progress. Instead, we're unraveling our existence like an
 infinite ball of yarn, with each revolution of the ball getting us
 closer to purpose, to clarity, to zen. If we're left to oscillate
 around the ball, then we never creep nearer its center. The
-implication of Nietzsche's metaphor is a life is one without
-self-reflection, or at least one withou:t any productive
-reflection. Productive reflection is the following of the thread,
-tracing what we know now and using it make inferences about the paths
-which lie ahead. If the center is then unattainable, then perhaps
-happiness is merely the act of its pursuit, the act of continuing to
-follow the thread.
+implication of Nietzsche's metaphor is a life without self-reflection,
+or at least one without any productive reflection. Productive
+reflection is the following of the thread, tracing what we know now
+and using it make inferences about the paths which lie ahead. If the
+center is then unattainable, then perhaps happiness is merely the act
+of its pursuit, the act of continuing to follow the thread.
 
 Nevertheless, this realization is one which I came to after a week of
 living in my new skin, having removed a layer upon arrival at home. It
@@ -41,7 +40,7 @@ that happiness is simply the act of exposing a new self, one that is
 slightly nearer the true Self that lies at our core. I personally
 experience this as what I've deemed an "identity shift". This one was
 particularly affecting, however, because it traveled with an awareness
-of /why/, again reiterating that without forward progress, without a
+of _why_, again reiterating that without forward progress, without a
 steady convergence, the shift is merely a shift. An
 oscillation. Happiness and contentment are fed by the thread we leave
 behind.
