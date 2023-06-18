@@ -22,7 +22,7 @@ freedom, I realized that this observation was in need of refinement.
 
 Identity is, through life, a convergence on some unattainable
 state. The problem with Nietzsche's take is that an oscillation makes
-no forward progress. Instead, we're unraveling our existence like an
+no forward progress. Instead, we're unraveling our existence like an
 infinite ball of yarn, with each revolution of the ball getting us
 closer to purpose, to clarity, to zen. If we're left to oscillate
 around the ball, then we never creep nearer its center. The
