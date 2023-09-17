@@ -70,6 +70,10 @@ main =
       route toIdxPath
       compile $ asPostTemp defaultContext
 
+    match "*.md" $ do
+      route toIdxPath
+      compile $ pandocWithSidenotes >>= loadAndApplyTemplate "templates/post.html" defaultContext
+
 byHomeKey :: (MonadMetadata m, MonadFail m) => [Item a] -> m [Item a]
 byHomeKey list = do
   homeKeyed <- foldM f [] list

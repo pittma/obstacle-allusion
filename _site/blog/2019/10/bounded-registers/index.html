@@ -51,7 +51,7 @@
 
      <div id="content">
 
-       <h1>Using Type-Level Programming in Rust to Make Safer Hardware Abstractions</h1>
+       <h1 id="title">Using Type-Level Programming in Rust to Make Safer Hardware Abstractions</h1>
        
 
        
@@ -114,7 +114,7 @@ bulk of the drivers appear in the Linux kernel.</p>
 if our type system was one borne out of modern programming languages
 research. That is, what could we do with a richer, more expressive
 type system to make this process safer and more tenable?</p>
-<h2 id="level-i-using-rust-to-talk-to-hardware">Level I: Using Rust to talk to hardware</h2>
+<h1 id="level-i-using-rust-to-talk-to-hardware">Level I: Using Rust to talk to hardware</h1>
 <p>With Rust we can use data structures to represent fields, we can
 attach them to specific registers, and we can provide concise and
 sensible ergonomics with interacting with the hardware. This first
@@ -182,7 +182,7 @@ in our implementation for how we access and interact with hardware
 registers at compile-time instead of discovering them at runtime?
 Perhaps we can lean on one of the strategies commonly used to suss out
 issues at compile-time, like types.</p>
-<h2 id="leveling-up">Leveling Up</h2>
+<h1 id="leveling-up">Leveling Up</h1>
 <p>Let’s modify our earlier example by using
 <a href="https://docs.rs/crate/typenum">typenum</a>, a library that provides
 numbers and arithmetic at the type level. Here we’ll parameterize our
@@ -235,7 +235,7 @@ unfortunate; it would be nice to know that a value I’m attempting to
 write into a field will actually fit into that field before attempting
 a write. As a matter of fact, I’d consider lopping off the high bits
 of an errant field value <em>undefined behavior</em> (*gasps*).</p>
-<h2 id="safety-first">Safety First</h2>
+<h1 id="safety-first">Safety First</h1>
 <p>How can we check that a field’s value fits in its prescribed position
 in a general way? More type-level numbers!</p>
 <p>We can add a <code>Width</code> parameter to <code>Field</code>, and use it to verify that
@@ -323,7 +323,7 @@ interactions.</p>
 more succinct than the type parameter salad we ended up with. Is doing
 such a thing even tractable when you’re talking about potentially
 hundreds or even thousands of registers?</p>
-<h2 id="safe-and-accessible">Safe and Accessible</h2>
+<h1 id="safe-and-accessible">Safe and Accessible</h1>
 <p>Earlier I called out calculating our masks by hand as being
 problematic, but then all I really did was the same problematic
 thing—albeit at the type-level. While the use of such an approach is
@@ -385,7 +385,7 @@ get a single field’s value, do collective actions, and find out if any
 or all of a collection of bits are set. You can read the documentation
 on the <a href="https://github.com/auxoncorp/bounded-registers#the-register-api">complete generated API
 here</a>.</p>
-<h2 id="kicking-the-tires">Kicking the Tires</h2>
+<h1 id="kicking-the-tires">Kicking the Tires</h1>
 <p>So what does it look like to actually use these definitions for a real
 device? Is code going to be littered with type parameters, obscuring
 any real logic from view?</p>
@@ -479,7 +479,7 @@ Should Never Happen case.<br />
 <span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> input <span class="op">=</span> regs<span class="op">.</span>rx<span class="op">.</span>get_field(<span class="pp">UartRX::Data::Field::</span><span class="bu">Read</span>)<span class="op">.</span>unwrap()<span class="op">;</span></span>
 <span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    regs<span class="op">.</span>tx<span class="op">.</span>modify(<span class="pp">UartTX::Data::Field::</span>new(input)<span class="op">.</span>unwrap())<span class="op">;</span></span>
 <span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<h2 id="decoding-failure">Decoding Failure</h2>
+<h1 id="decoding-failure">Decoding Failure</h1>
 <p>Depending on your personal pain threshold you may have noticed that
 the errors are nearly unintelligible. Let’s look at a not-so-subtle
 reminder of what I’m talking about:</p>
@@ -510,7 +510,7 @@ share <code>tnfilt</code>. You use it like this:</p>
 <p>It transforms the output above into something like this:</p>
 <pre><code>error[E0271]: type mismatch resolving `&lt;U20 as typenum::IsLessOrEqual&lt;U10&gt;&gt;::Output == typenum::B1`</code></pre>
 <p>Now that makes sense!</p>
-<h2 id="in-conclusion">In Conclusion</h2>
+<h1 id="in-conclusion">In Conclusion</h1>
 <p>Memory-mapped registers are used ubiquitously when interacting with
 hardware from our software, and there are myriad ways in which to
 portray those interactions, each of which has a different place on the

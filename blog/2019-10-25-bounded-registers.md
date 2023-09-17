@@ -78,7 +78,7 @@ if our type system was one borne out of modern programming languages
 research. That is, what could we do with a richer, more expressive
 type system to make this process safer and more tenable?
 
-## Level I: Using Rust to talk to hardware
+# Level I: Using Rust to talk to hardware
 
 With Rust we can use data structures to represent fields, we can
 attach them to specific registers, and we can provide concise and
@@ -167,7 +167,7 @@ registers at compile-time instead of discovering them at runtime?
 Perhaps we can lean on one of the strategies commonly used to suss out
 issues at compile-time, like types.
 
-## Leveling Up
+# Leveling Up
 
 Let’s modify our earlier example by using
 [typenum](https://docs.rs/crate/typenum), a library that provides
@@ -234,7 +234,7 @@ write into a field will actually fit into that field before attempting
 a write. As a matter of fact, I’d consider lopping off the high bits
 of an errant field value _undefined behavior_ (\*gasps\*).
 
-## Safety First
+# Safety First
 
 How can we check that a field’s value fits in its prescribed position
 in a general way? More type-level numbers!
@@ -343,7 +343,7 @@ more succinct than the type parameter salad we ended up with. Is doing
 such a thing even tractable when you’re talking about potentially
 hundreds or even thousands of registers?
 
-## Safe and Accessible
+# Safe and Accessible
 
 Earlier I called out calculating our masks by hand as being
 problematic, but then all I really did was the same problematic
@@ -417,7 +417,7 @@ or all of a collection of bits are set. You can read the documentation
 on the [complete generated API
 here](https://github.com/auxoncorp/bounded-registers#the-register-api).
 
-## Kicking the Tires
+# Kicking the Tires
 
 So what does it look like to actually use these definitions for a real
 device? Is code going to be littered with type parameters, obscuring
@@ -531,7 +531,7 @@ fn main() {
 ```
 
 
-## Decoding Failure
+# Decoding Failure
 
 Depending on your personal pain threshold you may have noticed that
 the errors are nearly unintelligible. Let’s look at a not-so-subtle
@@ -578,7 +578,7 @@ error[E0271]: type mismatch resolving `<U20 as typenum::IsLessOrEqual<U10>>::Out
 
 Now that makes sense!
 
-## In Conclusion
+# In Conclusion
 
 Memory-mapped registers are used ubiquitously when interacting with
 hardware from our software, and there are myriad ways in which to

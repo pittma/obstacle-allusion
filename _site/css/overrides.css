@@ -26,6 +26,11 @@ h1 {
     margin-bottom: 0;
 }
 
+#title {
+    font-size: 4em;
+    font-weight: bold;
+}
+
 article {
     padding: 0;
 }
