@@ -2,7 +2,6 @@
 title: "A refinement of Nietzsche's Discussion on Identity"
 track: true
 publish: true
-home: true
 tags: philosophy, self
 ---
 
