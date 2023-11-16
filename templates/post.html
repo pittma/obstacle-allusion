@@ -8,11 +8,17 @@ $partial("templates/header.html")$
        $endif$
 
        $if(date)$
-       $date$
+       <strong>published on</strong>: $date$
+       $endif$
+       $if(updated)$
+       | <strong>updated</strong>: $updated$
        $endif$
        $if(tags)$
-       |
+       | <strong>tagged:</strong> 
        $tags$
+       $endif$
+       $if(origin)$
+       | <strong>origin</strong>: $origin$
        $endif$
 	 
        <article>

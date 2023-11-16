@@ -2,6 +2,7 @@
 title: "Tell Me I'm Worthless"
 publish: true
 track: true
+origin: '<a href="https://www.goodreads.com/review/show/5254605363">goodreads</a>'
 tags: book, review
 ---
 

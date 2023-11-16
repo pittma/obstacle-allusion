@@ -4,6 +4,8 @@ publish: true
 track: true
 home: true
 tags: programming, rust, formal methods
+origin: '<a href="https://blog.auxon.io/2019/10/25/type-level-registers/">auxon</a>'
+updated: 04-02-2023
 ---
 
 Introducing
@@ -589,11 +591,3 @@ more-safe side of that safety spectrum and then tried to figure out
 how to move the ease-of-use slider closer to the easy end. From those
 ambitions `bounded-registers` was born, and I hope you'll keep it in
 mind any time you encounter memory-mapped devices in you adventures.
-
----
-
-A version of this post exists at:
-[blog.auxon.io](https://blog.auxon.io/2019/10/25/type-level-registers/)
-
-I copied it here with minor edits, mainly because I didn't want it to
-get lost.

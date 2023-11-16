@@ -3,6 +3,7 @@ title: "The Lathe of Heaven"
 subtitle: A cautionary tale about infinite possibility.
 publish: true
 track: true
+origin: '<a href="https://www.goodreads.com/review/show/5227047143">goodreads</a>'
 tags: book, review
 ---
 
